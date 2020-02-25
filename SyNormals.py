@@ -1,10 +1,10 @@
 # (c) adsn 2012, Recalc Vertex Normals
-# > edited by Pillars of Sy
+# > edited by Pillars of Sy (Simon Gloor)
 # > edited by Raumgleiter AG
-# 
+#
 # This addon manipulates vertex normals and stores them into an object
 # property.
-# 
+#
 
 #
 # ***** BEGIN GPL LICENSE BLOCK *****
@@ -26,8 +26,8 @@
 #
 # ***** END GPL LICENCE BLOCK *****
 
-  
-import bmesh  
+
+import bmesh
 import bpy
 import mathutils
 import bgl
@@ -37,12 +37,12 @@ from sys import float_info as fi
 
 ##########################################################
 # draw UI ButtonS
-class vertex_normals_ui(bpy.types.Panel):
+class SY_PT_vertex_normals_ui(bpy.types.Panel):
     bl_idname = "SyNormals"
     bl_label = 'SyTools | Vertex Normals'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-    
+
     def __init__(self):
         pass
 
@@ -54,7 +54,7 @@ class vertex_normals_ui(bpy.types.Panel):
             return (ob.type == 'MESH')
         except AttributeError:
             return 0
-      
+
     def draw(self, context):
 
         layout = self.layout
@@ -63,7 +63,7 @@ class vertex_normals_ui(bpy.types.Panel):
         # standard normal commands
         box = self.layout.box()
         box.label(text='Standard Tools')
-        
+
         col = box.column(align=True)
         row = col.row(align=True)
         row.operator('object.shade_smooth', text = 'Smooth')
@@ -106,12 +106,12 @@ class vertex_normals_ui(bpy.types.Panel):
         # clear
         row = col.row(align=True)
         row.operator('object.clear_normal', text = 'Clear')
-        
+
         # copy and paste
         row = col.row(align=True)
         row.operator('object.copy_normal', text = 'Copy')
         row.operator('object.paste_normal', text = 'Paste')
-        
+
 
         # manipulate normals simple
         col = box.column(align=True)
@@ -121,12 +121,12 @@ class vertex_normals_ui(bpy.types.Panel):
         row = col.row(align=True)
         row.operator('object.invert_selection', text = 'Inv Sel')
         row.operator('object.select_vertex', text = 'Cycle Sel')
-        
+
         # simple manipulations
         row = col.row()
         row.column().prop(context.window_manager, 'customnormal2', expand = True, text='')
         row.prop(context.window_manager, 'customnormal1', text='')
-        
+
 
         # manipulate normals complex
         col = box.column(align=True)
@@ -146,9 +146,9 @@ class vertex_normals_ui(bpy.types.Panel):
             if context.active_object.mode != context.window_manager.reloadchange:
                 if context.active_object.mode != 'EDIT':
                     context.window_manager.reload = not context.window_manager.reload
-                    
+
             context.window_manager.reloadchange = context.active_object.mode
-        
+
         if context.window_manager.autosave == True:
             if context.active_object.mode != context.window_manager.savechange:
                 if context.active_object.mode != 'OBJECT':
@@ -164,11 +164,11 @@ class vertex_normals_ui(bpy.types.Panel):
 # process only selected vertices
 # skip unselected to preserve normals on non transparent geometry
 
-class tree_vertex_normals(bpy.types.Operator):
+class SY_OT_tree_vertex_normals(bpy.types.Operator):
     bl_idname = 'object.tree_vertex_normals'
     bl_label = 'Vertex Normal Tree'
     bl_description = 'Align selected verts pointing away from 3d cursor'
-        
+
     def execute(self, context):
 
         obj = context.active_object
@@ -185,9 +185,9 @@ class tree_vertex_normals(bpy.types.Operator):
                     vec2 = obj.data.vertices[i].co
                     newvec = vec2 - vec1 + obj.location
                     newnormal = newvec.normalized()
-    
+
                     obj.data.vertices[i].normal = newnormal
-                
+
                 # update vertex normal list
                 if context.window_manager.autosave == True:
                     if len(context.object.vertex_normal_list) <= i:
@@ -195,7 +195,7 @@ class tree_vertex_normals(bpy.types.Operator):
                         item.normal = obj.data.vertices[i].normal
                     else:
                         context.object.vertex_normal_list[i]['normal'] = obj.data.vertices[i].normal
-        
+
         bpy.ops.object.mode_set(mode='EDIT')
         context.area.tag_redraw()
         return {'FINISHED'}
@@ -206,7 +206,7 @@ class tree_vertex_normals(bpy.types.Operator):
 # align selected verts to global z axis
 # and unselected to 3d cursor
 
-class foliage_vertex_normals(bpy.types.Operator):
+class SY_OT_foliage_vertex_normals(bpy.types.Operator):
     bl_idname = 'object.foliage_vertex_normals'
     bl_label = 'Vertex Normal Foliage'
     bl_description = 'Selected verts to Z axis, unselected away from 3d cursor'
@@ -217,24 +217,24 @@ class foliage_vertex_normals(bpy.types.Operator):
         vec1 = context.scene.cursor_location
 
         bpy.ops.object.mode_set(mode='OBJECT')
-        
+
         if 'vertex_normal_list' not in context.active_object:
             context.active_object['vertex_normal_list'] = []
         if 'vertex_normal_list' in context.active_object:
             for i in range(vert_index):
-                
+
                 # selected verts will align on z-axis
                 if context.active_object.data.vertices[i].select == True:
                     obj.data.vertices[i].normal = (0.0, 0.0, 1.0)
-                
+
                 # unselected verts will align on 3d cursor
                 elif context.active_object.data.vertices[i].select == False:
                     vec2 = obj.data.vertices[i].co
                     newvec = vec2 - vec1 + obj.location
                     newnormal = newvec.normalized()
-    
+
                     obj.data.vertices[i].normal = newnormal
-                
+
                 # update vertex normal list
                 if context.window_manager.autosave == True:
                     if len(context.object.vertex_normal_list) <= i:
@@ -262,11 +262,11 @@ def update_custom_normal1(self, context):
             # selected verts align on custom normal
             if context.active_object.data.vertices[i].select == True:
                 obj.data.vertices[i].normal = context.window_manager.customnormal1
-            
-            # unselected verts are skipped 
+
+            # unselected verts are skipped
             elif context.active_object.data.vertices[i].select == False:
                 pass
-            
+
             # update vertex normal list
             if context.window_manager.autosave == True:
                 if len(context.object.vertex_normal_list) <= i:
@@ -287,8 +287,8 @@ def update_custom_normal2(self, context):
             # selected verts align on custom normal
             if context.active_object.data.vertices[i].select == True:
                 obj.data.vertices[i].normal = context.window_manager.customnormal2
-            
-            # unselected verts are skipped 
+
+            # unselected verts are skipped
             elif context.active_object.data.vertices[i].select == False:
                 pass
             # update vertex normal list
@@ -302,7 +302,7 @@ def update_custom_normal2(self, context):
 
 ##########################################################
 # select next vertex
-class select_vertex(bpy.types.Operator):
+class SY_OT_select_vertex(bpy.types.Operator):
     bl_idname = 'object.select_vertex'
     bl_label = 'Select Vertex'
     bl_description = 'Toggles through vertices'
@@ -310,16 +310,16 @@ class select_vertex(bpy.types.Operator):
     def execute(self, context):
         obj = context.active_object
         vert_index = len(context.active_object.data.vertices)
-        
+
         if 'select_vertex' not in context.active_object:
             context.active_object['select_vertex'] = 0
-    
+
         if 'select_vertex' in context.active_object:
-            
+
             for h in range(vert_index):
                 if context.active_object.data.vertices[h].select == True:
                     obj['select_vertex'] = h
- 
+
             if obj['select_vertex'] < vert_index-1:
                 obj['select_vertex'] += 1
             else:
@@ -327,16 +327,16 @@ class select_vertex(bpy.types.Operator):
 
             # select next vertex
             for i in range(vert_index):
-                
+
                 if i == obj['select_vertex']:
                     context.active_object.data.vertices[i].select = True
                 else:
                     context.active_object.data.vertices[i].select = False
 
-            return {'FINISHED'}  
+            return {'FINISHED'}
 ##########################################################
 # invert vertex selection
-class invert_selection(bpy.types.Operator):
+class SY_OT_invert_selection(bpy.types.Operator):
     bl_idname = 'object.invert_selection'
     bl_label = 'Invert Selection'
     bl_description = 'Inverts Selected Vertices'
@@ -346,7 +346,7 @@ class invert_selection(bpy.types.Operator):
         vert_index = len(context.active_object.data.vertices)
         # invert selection
         for i in range(vert_index):
-            
+
             if context.active_object.data.vertices[i].select == True:
                 context.active_object.data.vertices[i].select = False
             else:
@@ -358,10 +358,10 @@ class invert_selection(bpy.types.Operator):
 def reload(self, context):
     vertices = context.active_object.data.vertices
     obj = context.active_object
-    
+
     for i in range(len(obj.vertex_normal_list)):
         vertices[i].normal = obj.vertex_normal_list[i]['normal']
-    
+
     context.area.tag_redraw()
 
 ##########################################################
@@ -369,13 +369,13 @@ def reload(self, context):
 def save(self, context):
     obj = context.active_object
     vert_index = len(bpy.context.active_object.data.vertices)
-        
+
     if 'vertex_normal_list' not in context.active_object:
         context.active_object['vertex_normal_list'] = []
-        
+
     if 'vertex_normal_list' in context.active_object:
         for i in range(vert_index):
-           
+
             # update vertex normal list
             if len(context.object.vertex_normal_list) <= i:
                 item = context.object.vertex_normal_list.add()
@@ -386,7 +386,7 @@ def save(self, context):
 
 ##########################################################
 # copy normal
-class copy_normal(bpy.types.Operator):
+class SY_OT_copy_normal(bpy.types.Operator):
     bl_idname = 'object.copy_normal'
     bl_label = 'Copy Normal'
     bl_description = 'Copies normal from selected Vertex'
@@ -395,7 +395,7 @@ class copy_normal(bpy.types.Operator):
         context.window_manager.save = not context.window_manager.save
         bpy.ops.object.mode_set(mode='OBJECT')
         context.window_manager.reload = not context.window_manager.reload
-        
+
         obj = context.active_object
         vert_index = len(context.active_object.data.vertices)
 
@@ -408,7 +408,7 @@ class copy_normal(bpy.types.Operator):
             for i in range(vert_index):
                 if context.active_object.data.vertices[i].select == True:
                     context.window_manager.copynormal = context.active_object.data.vertices[i].normal
-                
+
 #                if context.window_manager.autosave == True:
 #                    if len(context.object.vertex_normal_list) <= i:
 #                        item = context.object.vertex_normal_list.add()
@@ -417,13 +417,13 @@ class copy_normal(bpy.types.Operator):
 #                        context.object.vertex_normal_list[i]['normal'] = obj.data.vertices[i].normal
         else:
             self.report({'INFO'}, 'please select a single vertex')
-        
+
         bpy.ops.object.mode_set(mode='EDIT')
         return {'FINISHED'}
 
 ##########################################################
 # paste normal
-class paste_normal(bpy.types.Operator):
+class SY_OT_paste_normal(bpy.types.Operator):
     bl_idname = 'object.paste_normal'
     bl_label = 'Paste Normal'
     bl_description = 'Paste normal to selected Vertex'
@@ -432,15 +432,15 @@ class paste_normal(bpy.types.Operator):
         context.window_manager.save = not context.window_manager.save
         bpy.ops.object.mode_set(mode='OBJECT')
         context.window_manager.reload = not context.window_manager.reload
-        
+
         obj = context.active_object
         vert_index = len(context.active_object.data.vertices)
-        
+
         check = 0
         # inverse selection
         if 'select_vertex' not in context.active_object:
             context.active_object['select_vertex'] = 0
-    
+
         if 'select_vertex' in context.active_object:
             for h in range(vert_index):
                 if context.active_object.data.vertices[h].select == True:
@@ -449,7 +449,7 @@ class paste_normal(bpy.types.Operator):
                 for i in range(vert_index):
                     if context.active_object.data.vertices[i].select == True:
                         context.active_object.data.vertices[i].normal = context.window_manager.copynormal
-                        
+
 #                    if context.window_manager.autosave == True:
 #                        if len(context.object.vertex_normal_list) <= i:
 #                            item = context.object.vertex_normal_list.add()
@@ -458,7 +458,7 @@ class paste_normal(bpy.types.Operator):
 #                            context.object.vertex_normal_list[i]['normal'] = obj.data.vertices[i].normal
             else:
                 self.report({'INFO'}, 'please select at least one vertex')
-        
+
         context.window_manager.save = not context.window_manager.save
         bpy.ops.object.mode_set(mode='EDIT')
         context.area.tag_redraw()
@@ -466,13 +466,13 @@ class paste_normal(bpy.types.Operator):
 
 ##########################################################
 # clear normals
-class clear_normal(bpy.types.Operator):
+class SY_OT_clear_normal(bpy.types.Operator):
     bl_idname = 'object.clear_normal'
     bl_label = 'Clear Normal'
     bl_description = 'Reset the Normals'
 
     def execute(self, context):
-        
+
         context.window_manager.autoreload = False
         bpy.ops.object.editmode_toggle()
         bpy.ops.object.editmode_toggle()
@@ -481,7 +481,7 @@ class clear_normal(bpy.types.Operator):
 
 ##########################################################
 # invert normals
-class invert_normal(bpy.types.Operator):
+class SY_OT_invert_normal(bpy.types.Operator):
     bl_idname = 'object.invert_normal'
     bl_label = 'Invert Normal'
     bl_description = 'Invert selected Normals'
@@ -497,8 +497,8 @@ class invert_normal(bpy.types.Operator):
                 # selected verts align on custom normal
                 if context.active_object.data.vertices[i].select == True:
                     obj.data.vertices[i].normal = -obj.data.vertices[i].normal
-                
-                # unselected verts are skipped 
+
+                # unselected verts are skipped
                 elif context.active_object.data.vertices[i].select == False:
                     pass
                 # update vertex normal list
@@ -517,15 +517,15 @@ class invert_normal(bpy.types.Operator):
 def nearestVertexNormal(sourceverts, vert, MAXDIST):
     '''
     Acquire Vector normal of nearest-location sourcevert to vert.
-    sourceverts = BMVertSeq, source object verts 
-    vert = Vector, comparison vert coordinate 
-    MAXDIST = float, max distance to consider nearest 
+    sourceverts = BMVertSeq, source object verts
+    vert = Vector, comparison vert coordinate
+    MAXDIST = float, max distance to consider nearest
     '''
     nearest = None
     nearestdist = fi.max
     if MAXDIST == 0.0:
         MAXDIST = fi.max
-    
+
     for svert in sourceverts:
         dist = (vert.co - svert.co).magnitude
         if dist < nearestdist and dist < MAXDIST:
@@ -546,7 +546,7 @@ def gatherSourceVerts(bmsrc, src, scene, BOUNDS):
     '''
     bmsrc.from_mesh(src.to_mesh(scene, True, 'PREVIEW'))
     bmsrc.transform(src.matrix_world)
-    
+
     if BOUNDS != 'INCLUDE':
         invalidverts = []
         boundaryvert = False
@@ -584,7 +584,7 @@ def joinBoundaryVertexNormals(self, context, destobjs,
     bms = {}
     bmsrc = bmesh.new()
     scene = context.scene
-    
+
     for obj in destobjs:
         # These type != 'MESH' checks could be alleviated by removing
         #  non-mesh objects in execute(), but, may wish to
@@ -596,13 +596,13 @@ def joinBoundaryVertexNormals(self, context, destobjs,
         bm.from_mesh(obj.to_mesh(scene, False, 'PREVIEW'))
         bm.transform(obj.matrix_world)
         destverts = bm.verts
-        
+
         for otherobj in destobjs:
             if otherobj.type != 'MESH' or obj == otherobj:
                 continue
             gatherSourceVerts(bmsrc, otherobj, scene, 'ONLY')
             sourceverts = bmsrc.verts
-            
+
             for vert in destverts:
                 near = nearestVertexNormal(sourceverts, vert, MAXDIST)
                 if near:
@@ -610,7 +610,7 @@ def joinBoundaryVertexNormals(self, context, destobjs,
                     vert.normal = (vert.normal + offset) * 0.5
                     vert.normal.normalize()
             bmsrc.clear()
-    
+
     for name in bms:
         # Everything's been modified by everything else's original state,
         #  time to apply the modified data to the original objects
@@ -626,10 +626,10 @@ def transferVertexNormals(self, context, src, destobjs,
                           INFL=1.0, MAXDIST=0.00, BOUNDS='IGNORE'):
     '''
     Transfer smoothing from one object to other selected objects.
-    src = source object to transfer from 
-    destobjs = list of objects to influence 
-    INFL = influence strength 
-    MAXDIST = max distance to influence 
+    src = source object to transfer from
+    destobjs = list of objects to influence
+    INFL = influence strength
+    MAXDIST = max distance to influence
     BOUNDS = ignore/include/only use boundary edges
     '''
     bm = bmesh.new()
@@ -637,14 +637,14 @@ def transferVertexNormals(self, context, src, destobjs,
     scene = context.scene
     gatherSourceVerts(bmsrc, src, scene, BOUNDS)
     sourceverts = bmsrc.verts
-    
+
     for obj in destobjs:
         if obj.type != 'MESH' or obj == src:
             continue
         bm.from_mesh(obj.to_mesh(scene, False, 'PREVIEW'))
         bm.transform(obj.matrix_world)
         destverts = bm.verts
-        
+
         for vert in destverts:
             near = nearestVertexNormal(sourceverts, vert, MAXDIST)
             if near:
@@ -653,15 +653,15 @@ def transferVertexNormals(self, context, src, destobjs,
                     offset = offset * -1
                 vert.normal = vert.normal.lerp(offset,abs(INFL))
                 vert.normal.normalize()
-        
+
         bm.transform(obj.matrix_world.inverted())
         bm.to_mesh(obj.data)
         bm.clear()
-    
+
     bm.free()
 
-class transfer_normal(bpy.types.Operator):
-    ''' 
+class SY_OT_transfer_normal(bpy.types.Operator):
+    '''
     Transfers nearest worldspace vertex normals from active object to selected.
     When 'Boundary Edges' is set to Only, each object checks all other objects.
     Example uses: baking, mollifying lowpoly foliage, hiding sub-object seams.
@@ -670,7 +670,7 @@ class transfer_normal(bpy.types.Operator):
     bl_label = "Transfer Vertex Normals"
     bl_description = "Transfer shading from active object to selected objects."
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     influence = bpy.props.FloatProperty(
             name='Influence',
             description='TransferD strength, negative inverts',
@@ -697,11 +697,11 @@ class transfer_normal(bpy.types.Operator):
                    ('ONLY', 'Only', 'Operate only on boundary edges.')],
             default='IGNORE'
             )
-    
+
     def execute(self,context):
         src = context.active_object
         destobjs = context.selected_objects
-        
+
         if context.mode != 'OBJECT':
             self.report({'ERROR'},'Must be performed in object mode')
             return{'CANCELLED'}
@@ -711,7 +711,7 @@ class transfer_normal(bpy.types.Operator):
         if len(destobjs) < 2:
             self.report({'ERROR'},'Requires two or more objects')
             return{'CANCELLED'}
-        
+
         if self.influence != 0.0:
             if self.bounds != 'ONLY':
                 transferVertexNormals(
@@ -729,24 +729,24 @@ class transfer_normal(bpy.types.Operator):
 ##########################################################
 ##########################################################
 # save all vertexnormals
-class save_normals(bpy.types.Operator):
+class SY_OT_save_normals(bpy.types.Operator):
 
     bl_idname = 'object.save_normals'
     bl_label = 'Save Normals'
     bl_description = 'Save Vertex Normals'
-        
+
     def execute(self, context):
         obj = context.active_object
         vert_index = len(bpy.context.active_object.data.vertices)
 
 
-        #bpy.ops.object.mode_set(mode='OBJECT')        
+        #bpy.ops.object.mode_set(mode='OBJECT')
         if 'vertex_normal_list' not in context.active_object:
             context.active_object['vertex_normal_list'] = []
-            
+
         if 'vertex_normal_list' in context.active_object:
             for i in range(vert_index):
-               
+
                 # update vertex normal list
                 if len(context.object.vertex_normal_list) <= i:
                     item = context.object.vertex_normal_list.add()
@@ -762,30 +762,30 @@ class vertex_normal_list(bpy.types.PropertyGroup):
     normal = bpy.props.FloatVectorProperty(default=(0.0, 0.0, 0.0))
 
 # update list
-class update_normal_list(bpy.types.Operator):
-    bl_idname = "object.update_normal_list" 
+class SY_OT_update_normal_list(bpy.types.Operator):
+    bl_idname = "object.update_normal_list"
     bl_label = "Update Vertex Normals"
     bl_description = 'Update vertex normals after EDITMODE'
-    
+
     def execute(self, context):
         vertices = context.active_object.data.vertices
         obj = context.active_object
-       
+
         bpy.ops.object.mode_set(mode='OBJECT')
-        
+
         for i in range(len(obj.vertex_normal_list)):
             vertices[i].normal = obj.vertex_normal_list[i]['normal']
-        
+
         context.area.tag_redraw()
-        
-        return{'FINISHED'}         
+
+        return{'FINISHED'}
 
 ##########################################################
 ##########################################################
 # draw Normals in OBJECTMODE
 def draw_line(self, context, vertexloc, vertexnorm, colour, thick):
     obj = context.active_object
-    
+
     #get obj rotation
     rot = obj.rotation_euler.to_matrix().inverted()
     scale = obj.scale
@@ -795,27 +795,27 @@ def draw_line(self, context, vertexloc, vertexnorm, colour, thick):
     x1 = vertex[0] * scale[0] + obj.location[0]
     y1 = vertex[1] * scale[1] + obj.location[1]
     z1 = vertex[2] * scale[2] + obj.location[2]
-    
+
     x2 = normal[0]*context.scene.tool_settings.normal_size* scale[0] + x1
     y2 = normal[1]*context.scene.tool_settings.normal_size* scale[1] + y1
     z2 = normal[2]*context.scene.tool_settings.normal_size* scale[2] + z1
-    
+
     bgl.glEnable(bgl.GL_BLEND)
     bgl.glLineWidth(thick)
     # set color
     bgl.glColor4f(*colour)
-    
+
     # draw line
     bgl.glBegin(bgl.GL_LINE_STRIP)
     bgl.glVertex3f(x1,y1,z1)
     bgl.glVertex3f(x2,y2,z2)
     bgl.glEnd()
     bgl.glDisable(bgl.GL_BLEND)
-    
+
 def InitGLOverlay(self, context):
 
     obj = context.active_object
-    
+
     if context.active_object != None and obj.type == 'MESH':
         vertex = context.active_object.data.vertices
         vert_index = len(vertex)
@@ -830,12 +830,12 @@ def InitGLOverlay(self, context):
                 draw_line(self, context, vertex[i].co, vertex[i].normal, (0.0,0.6,0.8,0.6),1)
 
 # draw normals in object mode operator
-class draw_normals(bpy.types.Operator):
+class SY_OT_draw_normals(bpy.types.Operator):
     bl_idname = 'object.draw_normals'
     bl_label = 'draw_normals'
     bl_description = 'Draw normals in OBJECTMODE'
     _handle = None
-    
+
     def modal(self, context, event):
         if not context.window_manager.drawnormal:
             context.area.tag_redraw()
@@ -843,20 +843,20 @@ class draw_normals(bpy.types.Operator):
             # context.region.callback_remove(self._handle)
             # use instead
             bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-            
+
             return {'CANCELLED'}
         return {'PASS_THROUGH'}
-    
+
     def cancel(self, context):
         if context.window_manager.drawnormal:
             # deprecated since 2.66
             # context.region.callback_remove(self._handle)
             # use instead
             bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
-            
+
             context.window_manager.drawnormal = False
         return {'CANCELLED'}
-    
+
     def invoke(self, context, event):
         if context.area.type == 'VIEW_3D':
             if context.window_manager.drawnormal == False:
@@ -879,29 +879,29 @@ class draw_normals(bpy.types.Operator):
 # init properties
 def init_properties():
     bpy.types.WindowManager.reloadchange = bpy.props.StringProperty(default='OBJECT')
-    
+
     bpy.types.WindowManager.autoreload = bpy.props.BoolProperty(default=False)
-    
+
     bpy.types.WindowManager.reload = bpy.props.BoolProperty(default=False, update=reload)
-    
+
     bpy.types.WindowManager.savechange = bpy.props.StringProperty(default='EDIT')
 
     bpy.types.WindowManager.autosave = bpy.props.BoolProperty(default=False)
-    
+
     bpy.types.WindowManager.save = bpy.props.BoolProperty(default=False, update=save)
-    
+
     bpy.types.Object.vertex_normal_list = bpy.props.CollectionProperty(
         type=vertex_normal_list)
-        
+
     bpy.types.Object.select_vertex = bpy.props.IntProperty(
         default=0)
-    
+
     bpy.types.WindowManager.drawnormal = bpy.props.BoolProperty(
         default=False)
-    
+
     bpy.types.WindowManager.copynormal = bpy.props.FloatVectorProperty(
         default=(0.0, 0.0, 0.0))
-    
+
     bpy.types.WindowManager.customnormal1 = bpy.props.FloatVectorProperty(
         default=(0.0, 0.0, 1.0),
         subtype = 'DIRECTION',
@@ -923,4 +923,3 @@ def clear_properties():
             del x
         except:
             pass
-    

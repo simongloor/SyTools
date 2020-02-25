@@ -1,4 +1,7 @@
- 
+# Copyright | Pillars of SY (Simon Gloor) | 2018 | All Rights Reserved
+
+# ***********************************************************************************************************************
+
 import bmesh
 import bpy
 import mathutils
@@ -10,12 +13,12 @@ from sys import float_info as fi
 
 ##########################################################
 # draw UI ButtonS
-class sy_panel_ui(bpy.types.Panel):
+class SY_PT_sy_panel_ui(bpy.types.Panel):
     bl_idname = "SyPanel"
     bl_label = 'SyTools'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
-    
+
     def __init__(self):
         pass
 
@@ -27,7 +30,7 @@ class sy_panel_ui(bpy.types.Panel):
             return (ob.type == 'MESH')
         except AttributeError:
             return 0
-      
+
     def draw(self, context):
 
         layout = self.layout
@@ -35,7 +38,7 @@ class sy_panel_ui(bpy.types.Panel):
         # standard normal commands
         box = self.layout.box()
         box.label(text='Standard Tools')
-        
+
         col = box.column(align=True)
         row = col.row(align=True)
         row.operator('object.shade_smooth', text = 'Smooth')

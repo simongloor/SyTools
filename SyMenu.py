@@ -1,3 +1,7 @@
+# Copyright | Pillars of SY (Simon Gloor) | 2018 | All Rights Reserved
+
+# ***********************************************************************************************************************
+
 import bpy
 import mathutils
 from mathutils import Vector
@@ -9,13 +13,13 @@ from bpy.props import *
 import bmesh
 
 
-class SyMenu(bpy.types.Menu):
+class SY_MT_SyMenu(bpy.types.Menu):
     bl_label = "SyT"
     bl_idname = "view3D.sy_menu"
-    
+
     def draw(self, context):
         layout = self.layout
- 
+
         #All Modes
 
         #File

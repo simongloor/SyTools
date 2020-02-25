@@ -1,5 +1,7 @@
+# Copyright | Pillars of SY (Simon Gloor) | 2018 | All Rights Reserved
 
-  
+# ***********************************************************************************************************************
+
 import bpy
 import mathutils
 from mathutils import Vector
@@ -13,12 +15,12 @@ import bmesh
 
 #************************************************************************************
 # CreateCamEqui
-class SySetCursorPivot(bpy.types.Operator):
+class SY_OT_SySetCursorPivot(bpy.types.Operator):
     bl_idname = "object.sy_set_cursor_pivot"
     bl_label = "Cursor Pivot (Sy)"
-    
+
     def execute(self, context):
-        
+
         bpy.ops.view3d.snap_cursor_to_selected()
         bpy.context.space_data.pivot_point = 'CURSOR'
 
@@ -26,12 +28,12 @@ class SySetCursorPivot(bpy.types.Operator):
 
 #************************************************************************************
 # CreateCamEqui
-class SyUpdateLinks(bpy.types.Operator):
+class SY_OT_SyUpdateLinks(bpy.types.Operator):
     bl_idname = "object.sy_update_links"
     bl_label = "Refresh File (Sy)"
-    
+
     def execute(self, context):
-        
+
         path = bpy.data.filepath
 
         if path:
@@ -45,12 +47,12 @@ class SyUpdateLinks(bpy.types.Operator):
 
 #************************************************************************************
 # CreateCamEqui
-class SyCreateCamEqui(bpy.types.Operator):
+class SY_OT_SyCreateCamEqui(bpy.types.Operator):
     bl_idname = "object.sy_create_cam_equi"
     bl_label = "Create Camera Equirectangular (Sy)"
-    
+
     def execute(self, context):
-        
+
         #Calculate Spawnpoint
         SpawnLoc = bpy.context.region_data.view_location
         OffsetVec = Vector((0, 0, bpy.context.region_data.view_distance))
@@ -74,15 +76,15 @@ class SyCreateCamEqui(bpy.types.Operator):
 
 #************************************************************************************
 # CutHole
-class SyCutHole(bpy.types.Operator):
+class SY_OT_SyCutHole(bpy.types.Operator):
     bl_idname = "mesh.sy_cut_hole"
     bl_label = "Cut Hole (Sy)"
-    
+
     def execute(self, context):
-        
+
         #Hide Mask
         bpy.ops.paint.hide_show(action = 'HIDE', area='MASKED')
-        
+
         #Select Hidden
         bpy.ops.sculpt.sculptmode_toggle()
         bpy.ops.object.editmode_toggle()
@@ -106,18 +108,18 @@ class SyCutHole(bpy.types.Operator):
         #Go back to Sculpting and enable DynTopo
         bpy.ops.sculpt.sculptmode_toggle()
         bpy.ops.sculpt.dynamic_topology_toggle()
-        
+
         return {'FINISHED'}
 
 
 #************************************************************************************
 # FaceToPoint
-class SyCreateCam(bpy.types.Operator):
+class SY_OT_SyCreateCam(bpy.types.Operator):
     bl_idname = "mesh.sy_face_to_point"
     bl_label = "Face to Point (Sy)"
-    
+
     def execute(self, context):
-        
+
         bpy.ops.mesh.extrude_region_move()
         bpy.ops.mesh.merge(type='CENTER')
 
@@ -126,12 +128,12 @@ class SyCreateCam(bpy.types.Operator):
 
 #************************************************************************************
 # CreateCam
-class SyCreateCam(bpy.types.Operator):
+class SY_OT_SyCreateCam(bpy.types.Operator):
     bl_idname = "object.sy_create_cam"
     bl_label = "Create Camera (Sy)"
-    
+
     def execute(self, context):
-        
+
         SpawnLoc = bpy.context.region_data.view_location
         OffsetVec = Vector((0, 0, bpy.context.region_data.view_distance))
         OffsetRot = bpy.context.region_data.view_rotation
@@ -145,45 +147,45 @@ class SyCreateCam(bpy.types.Operator):
 
 #************************************************************************************
 # CreateSculptSphere
-class SyOriginToSelection(bpy.types.Operator):
+class SY_OT_SyOriginToSelection(bpy.types.Operator):
     bl_idname = "object.sy_create_sculptsphere"
     bl_label = "Create SculptSphere (Sy)"
-    
+
     def execute(self, context):
-        
+
         bpy.ops.mesh.primitive_uv_sphere_add(size=1, view_align=False, enter_editmode=False, location=(0, 0, 0))
         bpy.ops.sculpt.sculptmode_toggle()
         bpy.ops.sculpt.dynamic_topology_toggle()
         bpy.context.scene.tool_settings.sculpt.detail_size = 10
         bpy.context.scene.tool_settings.sculpt.detail_refine_method = 'SUBDIVIDE_COLLAPSE'
-        
+
         return {'FINISHED'}
 
 
 #************************************************************************************
 # OriginToSelection
-class SyOriginToSelection(bpy.types.Operator):
+class SY_OT_SyOriginToSelection(bpy.types.Operator):
     bl_idname = "object.sy_origin_to_selection"
     bl_label = "Set Origin to Selection (Sy)"
-    
+
     def execute(self, context):
-        
+
         bpy.ops.view3d.snap_cursor_to_selected()
         bpy.ops.object.editmode_toggle()
         bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
         bpy.ops.object.editmode_toggle()
-        
+
         return {'FINISHED'}
 
-    
+
 #************************************************************************************
 # Create SkyboxCam
-class SyCreateSkyboxCam(bpy.types.Operator):
+class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
     bl_idname = "mesh.sy_create_skybox_cam"
     bl_label = "Create SkyboxCam (Sy)"
-    
+
     def execute(self, context):
-        
+
         #Set general Settings
         bpy.context.scene.render.engine = 'CYCLES'
         bpy.context.scene.render.resolution_x = 2048
@@ -221,7 +223,7 @@ class SyCreateSkyboxCam(bpy.types.Operator):
         bpy.data.objects['SkyboxCam.001'].select = True
         bpy.ops.object.duplicate_move()
         bpy.ops.transform.rotate(value=-1.5708, axis=(1, 0, 0), constraint_axis=(True, False, False), constraint_orientation='GLOBAL')
-    
+
 
         #Attach the Cams to a EmptyObject
         bpy.ops.object.select_all(action='DESELECT')
@@ -290,161 +292,161 @@ class SyCreateSkyboxCam(bpy.types.Operator):
         bpy.context.scene.frame_current = 1
         bpy.context.area.type = 'VIEW_3D'
 
-        
+
         return {'FINISHED'}
-    
+
 
 #************************************************************************************
 # Extract Masked
-class SyExtractMasked(bpy.types.Operator):
+class SY_OT_SyExtractMasked(bpy.types.Operator):
     bl_idname = "object.sy_extract_masked"
     bl_label = "Extract Masked (Sy)"
-    
+
     def execute(self, context):
-        
+
         #Duplicate Mesh
         bpy.ops.sculpt.sculptmode_toggle()
         bpy.ops.object.duplicate_move()
-        
+
         #Hide Mask
         bpy.ops.sculpt.sculptmode_toggle()
         bpy.ops.paint.hide_show(action = 'HIDE', area='MASKED')
-        
+
         #Delete Shown
         bpy.ops.sculpt.sculptmode_toggle()
         bpy.ops.object.editmode_toggle()
         bpy.ops.mesh.select_all(action='TOGGLE')
         bpy.ops.mesh.delete(type='FACE')
-        
+
         #Unhide and Deselect All
         bpy.ops.mesh.reveal()
         bpy.ops.mesh.select_all(action='TOGGLE')
         bpy.ops.object.editmode_toggle()
-        
+
         #Add Modifier
         bpy.ops.object.modifier_add(type='SOLIDIFY')
         bpy.context.object.modifiers["Solidify"].thickness = -0.02
-        
+
         #Go back to Sculpting
         bpy.ops.sculpt.sculptmode_toggle()
-        
-        
+
+
         return {'FINISHED'}
-    
+
 
 #************************************************************************************
 # Turn Subedge
-class SyTurnSubedge(bpy.types.Operator):
+class SY_OT_SyTurnSubedge(bpy.types.Operator):
     bl_idname = "mesh.sy_turn_subedge"
     bl_label = "Turn Subedge (Sy)"
-    
+
     def execute(self, context):
-        
+
         #ToTris
         bpy.ops.mesh.quads_convert_to_tris(use_beauty=True)
-            
+
         #Flip
         bpy.ops.mesh.edge_rotate()
-        
+
         #ToQuad
         bpy.ops.mesh.edge_face_add()
-        
+
         return {'FINISHED'}
 
 #************************************************************************************
 # Add Cube upon Grid
-class SyCreateCube(bpy.types.Operator):
+class SY_OT_SyCreateCube(bpy.types.Operator):
     bl_idname = "mesh.sy_create_cube"
     bl_label = "Create Cube (Sy)"
-    
+
     def execute(self, context):
-        
+
         #Move Cursor to Zero
         bpy.ops.view3d.snap_cursor_to_center()
-            
+
         #Create Cube
         bpy.ops.mesh.primitive_cube_add(enter_editmode=True)
-        
+
         #Move Cube Up
         bpy.ops.transform.translate(value=(0, 0, 1))
-        
+
         return {'FINISHED'}
-    
+
 #************************************************************************************
 # Move Selection to Zero
-class SyMoveSelectionToZero(bpy.types.Operator):
+class SY_OT_SyMoveSelectionToZero(bpy.types.Operator):
     bl_idname = "object.sy_move_selection_to_zero"
     bl_label = "Move Selection to Origin (Sy)"
-    
+
     def execute(self, context):
-        
+
         #Move Cursor to Selection
         bpy.ops.view3d.snap_cursor_to_selected()
-        
+
         #Move to ObjectMode
         bpy.ops.object.mode_set(mode='OBJECT')
-            
+
         #Set Origin
         bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
-        
+
         #Move to Zero
         bpy.context.object.location[0] = 0
         bpy.context.object.location[1] = 0
         bpy.context.object.location[2] = 0
-        
+
         #return to the EditMode
         bpy.ops.object.mode_set(mode='EDIT')
-        
+
         return {'FINISHED'}
 
 
 
 #************************************************************************************
 # Fix the Rotation to match Unity
-class SyFixRotation(bpy.types.Operator):
+class SY_OT_SyFixRotation(bpy.types.Operator):
     bl_idname = "object.sy_fix_rotation"
     bl_label = "Fix Rotation for Unity (Sy)"
-    
+
     def execute(self, context):
 
         #Save old PivotOption
         OldPivotOption = bpy.context.space_data.pivot_point
-    
+
         #Set new PivotOption
         bpy.context.space_data.pivot_point = 'INDIVIDUAL_ORIGINS'
-    
+
         #Rotate Selection -90
         bpy.ops.transform.rotate(value=-1.5708, axis=(1, 0, 0), constraint_axis=(True, False, False), constraint_orientation='GLOBAL')
-    
+
         #Apply Rotation
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
 
         #Rotate Selection -90
         bpy.ops.transform.rotate(value=1.5708, axis=(1, 0, 0), constraint_axis=(True, False, False), constraint_orientation='GLOBAL')
-    
+
         #Restore old PivotOption
         bpy.context.space_data.pivot_point = OldPivotOption
-            
+
         return {'FINISHED'}
 
 
 #************************************************************************************
 # Dissolve Edge completely
-class SyDissolveEdge(bpy.types.Operator):
+class SY_OT_SyDissolveEdge(bpy.types.Operator):
     bl_idname = "mesh.sy_dissolve_edge"
     bl_label = "Dissolve Edge (Sy)"
-    
+
     def execute(self, context):
         bpy.ops.mesh.dissolve_edges(use_verts=False, use_face_split=False)
         bpy.ops.mesh.dissolve_verts(use_face_split=False)
 
         return {'FINISHED'}
-    
+
 
 #************************************************************************************
 # Connect on Intersection
 
-class SyEdgeIntersection(bpy.types.Operator):
+class SY_OT_SyEdgeIntersection(bpy.types.Operator):
     "Finds the mid-point of the shortest distance between two edges"
 
     bl_idname = "view3d.sy_edge_intersection"
@@ -457,45 +459,45 @@ class SyEdgeIntersection(bpy.types.Operator):
 
     def execute(self, context):
         from mathutils.geometry import intersect_line_line
-    
+
         obj = context.active_object
-    
+
         if (obj.type != "MESH"):
             operator.report({'ERROR'}, "Object must be a mesh")
             return None
-    
+
         edges = []
         mesh = obj.data
         verts = mesh.vertices
-    
+
         is_editmode = (obj.mode == 'EDIT')
         if is_editmode:
             bpy.ops.object.mode_set(mode='OBJECT')
-    
+
         for e in mesh.edges:
             if e.select:
                 edges.append(e)
-    
+
                 if len(edges) > 2:
                     break
-    
+
         if is_editmode:
             bpy.ops.object.mode_set(mode='EDIT')
-    
+
         if len(edges) != 2:
             operator.report({'ERROR'},
                             "Operator requires exactly 2 edges to be selected")
             return
-    
+
         line = intersect_line_line(verts[edges[0].vertices[0]].co,
                                    verts[edges[0].vertices[1]].co,
                                    verts[edges[1].vertices[0]].co,
                                    verts[edges[1].vertices[1]].co)
-    
+
         if line is None:
             operator.report({'ERROR'}, "Selected edges do not intersect")
             return
-    
+
         point = line[0].lerp(line[1], 0.5)
         context.scene.cursor_location = obj.matrix_world * point
         bpy.ops.mesh.merge(type='CURSOR', uvs=False)
@@ -504,15 +506,15 @@ class SyEdgeIntersection(bpy.types.Operator):
 #************************************************************************************
 # Convert WeightPaint to VertexPaint
 
-class Weight2VertexCol(bpy.types.Operator):
+class SY_OT_Weight2VertexCol(bpy.types.Operator):
     """Tooltip"""
     bl_idname = "object.sy_weight_to_vertexcol"
     bl_label = "Weight to VertexCol (Sy)"
     bl_space_type = "VIEW_3D"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     method=bpy.props.BoolProperty(name="Color", description="Choose the coloring method", default=False)
-    
+
     @classmethod
     def poll(cls, context):
         return context.active_object is not None
@@ -524,7 +526,7 @@ class Weight2VertexCol(bpy.types.Operator):
 
 
 def transferWeight2VertexCol(context, method):
-    
+
     bpy.ops.paint.vertex_paint_toggle()
     bpy.data.brushes["Draw"].color = (0, 0, 0)
     bpy.ops.paint.vertex_color_set()
@@ -532,64 +534,64 @@ def transferWeight2VertexCol(context, method):
 
     me=context.active_object
     verts=me.data.vertices
-    
+
     col=Color()
     col.h=0
     col.s=1
     col.v=1
-    
+
     #vcolgrp=bpy.context.active_object.data.vertex_colors.keys()
-    
+
     try:
         assert bpy.context.active_object.vertex_groups
         assert bpy.context.active_object.data.vertex_colors
-        
+
     except AssertionError:
-        bpy.ops.error.message('INVOKE_DEFAULT', 
+        bpy.ops.error.message('INVOKE_DEFAULT',
                 type = "Error",
                 message = 'you need at least one vertex group and one color group')
         return
-    
+
     vgrp=bpy.context.active_object.vertex_groups.keys()
-    
+
     vcolgrp=bpy.context.active_object.data.vertex_colors
-    
-    
+
+
     #Check to see if we have at least one vertex group and one vertex color group
-    if len(vgrp) > 0 and len(vcolgrp) > 0: 
+    if len(vgrp) > 0 and len(vcolgrp) > 0:
         print ("enough parameters")
-        
+
         #Colored
         if method:
             for poly in me.data.polygons:
                 for loop in poly.loop_indices:
-                    vertindex=me.data.loops[loop].vertex_index        
-                                           
+                    vertindex=me.data.loops[loop].vertex_index
+
                     #Check to see if the vertex has any geoup association
                     try:
                         weight=me.vertex_groups.active.weight(vertindex)
                     except:
                        continue
-        
-                    #col=Color ((r, g, b )) 
+
+                    #col=Color ((r, g, b ))
                     col.h=0.66*weight
                     col.s=1
                     col.v=1
                     me.data.vertex_colors.active.data[loop].color = (col.b, col.g, col.r)
-        
-            
+
+
         if not method:
             for poly in me.data.polygons:
                 for loop in poly.loop_indices:
-                    vertindex=me.data.loops[loop].vertex_index        
+                    vertindex=me.data.loops[loop].vertex_index
                     #weight=me.vertex_groups['Group'].weight(vertindex)
-                    
+
                     #Check to see if the vertex has any geoup association
                     try:
                         weight=me.vertex_groups.active.weight(vertindex)
                     except:
                         continue
-                    
+
                     col.r=weight
                     col.g=col.r
                     col.b=col.r
@@ -598,10 +600,10 @@ def transferWeight2VertexCol(context, method):
 
 #************************************************************************************
 # Add Seams on Border
-class SySeamBorder(bpy.types.Operator):
+class SY_OT_SySeamBorder(bpy.types.Operator):
     bl_idname = "mesh.sy_seam_border"
     bl_label = "Seam Border (Sy)"
-    
+
     def execute(self, context):
 
         # save selection
