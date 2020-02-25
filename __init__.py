@@ -1,12 +1,11 @@
 bl_info = {
-        "name": "SyTools",
-        "category": "3D View",
-        "author": "Pillars of SY | Simon Gloor",
-        "version": (1, 1, 0),
-        "blender": (2, 80, 0),
-        "description": "Tools to improve the Workflow for creating Game Assets",
-        "category": "Pillars of SY"
-        }
+    "name": "SyTools",
+    "author": "Pillars of SY | Simon Gloor",
+    "category": "Pillars of SY",
+    "version": (1, 1, 0),
+    "blender": (2, 80, 0),
+    "description": "Tools to improve the Workflow for creating Game Assets"
+    }
 
 if "bpy" in locals():
     import imp
@@ -47,6 +46,7 @@ classes = (
     SyCommands.SY_OT_Weight2VertexCol,
     SyCommands.SY_OT_SySeamBorder,
     SyMenu.SY_MT_SyMenu,
+    SyPanel.SY_PT_sy_panel_ui,
     # SyNormals.SY_PT_vertex_normals_ui,
     # SyNormals.SY_OT_tree_vertex_normals,
     # SyNormals.SY_OT_foliage_vertex_normals,
@@ -61,22 +61,21 @@ classes = (
     # # SyNormals.vertex_normal_list,
     # SyNormals.SY_OT_update_normal_list,
     # SyNormals.SY_OT_draw_normals,
-    SyPanel.SY_PT_sy_panel_ui,
     )
 
-register, unregister = bpy.utils.register_classes_factory(classes)
+# register, unregister = bpy.utils.register_classes_factory(classes)
 
-# def register():
-    # bpy.utils import register_class
-    # for cls in classes:
-    #     register_class(cls)
-    # SyNormals.init_properties()
+def register():
+    bpy.utils import register_class
+    for cls in classes:
+        register_class(cls)
+    SyNormals.init_properties()
 
-# def unregister():
-    # bpy.utils import unregister_class
-    # for cls in classes:
-    #     unregister_class(cls)
-    # SyNormals.clear_properties()
+def unregister():
+    bpy.utils import unregister_class
+    for cls in classes:
+        unregister_class(cls)
+    SyNormals.clear_properties()
 
 def draw_item(self, context):
     layout = self.layout
