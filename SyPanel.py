@@ -17,7 +17,7 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
     bl_idname = "SyPanel"
     bl_label = 'SyTools'
     bl_space_type = 'VIEW_3D'
-    bl_region_type = 'TOOLS'
+    bl_region_type = 'UI'
 
     def __init__(self):
         pass

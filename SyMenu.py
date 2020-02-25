@@ -14,7 +14,7 @@ import bmesh
 
 
 class SY_MT_SyMenu(bpy.types.Menu):
-    bl_label = "SyT"
+    bl_label = "SyTools"
     bl_idname = "view3D.sy_menu"
 
     def draw(self, context):
@@ -24,18 +24,18 @@ class SY_MT_SyMenu(bpy.types.Menu):
 
         #File
         layout.separator()
-        layout.label("File")
+        layout.label(text="File")
         layout.separator()
         layout.operator("object.sy_update_links")
 
         #ObjectMode
         if bpy.context.mode == 'OBJECT':
             layout.separator()
-            layout.label("ObjectMode", icon = 'OBJECT_DATAMODE')
+            layout.label(text="ObjectMode", icon = 'OBJECT_DATAMODE')
 
             #Create
             layout.separator()
-            layout.label("Create")
+            layout.label(text="Create")
             layout.separator()
             layout.operator("mesh.sy_create_cube")
             layout.operator("object.sy_create_sculptsphere")
@@ -45,35 +45,35 @@ class SY_MT_SyMenu(bpy.types.Menu):
 
             #Snap
             layout.separator()
-            layout.label("Snap n Pivot")
+            layout.label(text="Snap n Pivot")
             layout.separator()
             layout.operator("object.sy_set_cursor_pivot")
 
             #Clean
             layout.separator()
-            layout.label("Clean")
+            layout.label(text="Clean")
             layout.separator()
             layout.operator("object.sy_fix_rotation")
 
         #EditMode
         if bpy.context.mode == 'EDIT_MESH':
             layout.separator()
-            layout.label("EditMode", icon = 'EDITMODE_HLT')
+            layout.label(text="EditMode", icon = 'EDITMODE_HLT')
 
             layout.separator()
-            layout.label("Create")
+            layout.label(text="Create")
             layout.separator()
             layout.operator("object.sy_create_sculptsphere")
 
             #Select
             layout.separator()
-            layout.label("Select")
+            layout.label(text="Select")
             layout.separator()
             layout.operator("mesh.region_to_loop")
 
             #Edit
             layout.separator()
-            layout.label("Edit")
+            layout.label(text="Edit")
             layout.separator()
             layout.operator("mesh.bridge_edge_loops")
             layout.operator("mesh.vertices_smooth")
@@ -83,19 +83,19 @@ class SY_MT_SyMenu(bpy.types.Menu):
 
             #Unwrap
             layout.separator()
-            layout.label("Unwrap")
+            layout.label(text="Unwrap")
             layout.separator()
             layout.operator("mesh.sy_seam_border")
 
             #Snap
             layout.separator()
-            layout.label("Snap n Pivot")
+            layout.label(text="Snap n Pivot")
             layout.separator()
             layout.operator("object.sy_set_cursor_pivot")
 
             #Clean
             layout.separator()
-            layout.label("Clean")
+            layout.label(text="Clean")
             layout.separator()
             layout.operator("mesh.remove_doubles")
             layout.operator("object.sy_move_selection_to_zero")
@@ -105,11 +105,11 @@ class SY_MT_SyMenu(bpy.types.Menu):
         #SculptMode
         if bpy.context.mode == 'SCULPT':
             layout.separator()
-            layout.label("SculptMode", icon = 'SCULPTMODE_HLT')
+            layout.label(text="SculptMode", icon = 'SCULPTMODE_HLT')
 
             #Create
             layout.separator()
-            layout.label("Create")
+            layout.label(text="Create")
             layout.separator()
             layout.operator("object.sy_create_sculptsphere")
             layout.operator("mesh.sy_create_cube")
@@ -119,21 +119,21 @@ class SY_MT_SyMenu(bpy.types.Menu):
         #PoseMode
         if bpy.context.mode == 'POSE':
             layout.separator()
-            layout.label("PoseMode", icon = 'POSE_HLT')
+            layout.label(text="PoseMode", icon = 'POSE_HLT')
 
             #Pose
             layout.separator()
-            layout.label("Pose")
+            layout.label(text="Pose")
             layout.separator()
             layout.operator("pose.transforms_clear")
 
         #WeightPaint
         if bpy.context.mode == 'PAINT_WEIGHT':
             layout.separator()
-            layout.label("WeightMode", icon = 'WPAINT_HLT')
+            layout.label(text="WeightMode", icon = 'WPAINT_HLT')
 
             #Pose
             layout.separator()
-            layout.label("Convert")
+            layout.label(text="Convert")
             layout.separator()
             layout.operator("object.sy_weight_to_vertexcol")

@@ -31,6 +31,7 @@ class SY_OT_SySetCursorPivot(bpy.types.Operator):
 class SY_OT_SyUpdateLinks(bpy.types.Operator):
     bl_idname = "object.sy_update_links"
     bl_label = "Refresh File (Sy)"
+    bl_description = "Save and reopen the file to delete unused assets."
 
     def execute(self, context):
 
