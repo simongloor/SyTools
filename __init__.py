@@ -66,16 +66,14 @@ classes = (
 # register, unregister = bpy.utils.register_classes_factory(classes)
 
 def register():
-    bpy.utils import register_class
     for cls in classes:
-        register_class(cls)
-    SyNormals.init_properties()
+        bpy.utils.register_class(cls)
+    # SyNormals.init_properties()
 
 def unregister():
-    bpy.utils import unregister_class
-    for cls in classes:
-        unregister_class(cls)
-    SyNormals.clear_properties()
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
+    # SyNormals.clear_properties()
 
 def draw_item(self, context):
     layout = self.layout
