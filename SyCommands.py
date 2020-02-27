@@ -403,42 +403,16 @@ class SY_OT_SyMoveSelectionToZero(bpy.types.Operator):
 #************************************************************************************
 # Move Selection to Zero
 class SY_OT_FindNgons(bpy.types.Operator):
-    bl_idname = "object.sy_find_ngons"
+    bl_idname = "mesh.sy_find_ngons"
     bl_label = "Find Ngons (Sy)"
-    bl_description = "Searches all selected objects for faces with more than 4 sides."
+    bl_description = "Shortcut for select_face_by_sides(number=4, type='GREATER')"
 
     def execute(self, context):
+        #Deselect all
+        bpy.ops.mesh.select_all(action='DESELECT')
 
-        #Iterate through Objects
-        InitiallySelectedObjects = bpy.context.selected_objects
-        if len(InitiallySelectedObjects) > 0:
-            for iObject in InitiallySelectedObjects:
-
-                #Set Object Active
-                bpy.context.view_layer.objects.active = iObject
-
-                #Enter EditMode
-                bpy.ops.object.mode_set(mode='EDIT')
-
-                #Deselect all
-                bpy.ops.mesh.select_all(action='DESELECT')
-
-                #Select ngons
-                bpy.ops.mesh.select_face_by_sides(number=4, type='GREATER')
-
-                #Is anything selected?
-                Mesh = bmesh.from_edit_mesh(iObject.data)
-                SelectedVertices = [ v.index for v in Mesh.verts if v.select ]
-                CountSelectedVertices = len(SelectedVertices)
-                if(CountSelectedVertices > 0):
-                    #Abort
-                    return
-
-                #Enter ObjectMode
-                bpy.ops.object.mode_set(mode='OBJECT')
-
-        #Deselect to give user feedback
-        #bpy.ops.object.select_all(action='DESELECT')
+        #Select ngons
+        bpy.ops.mesh.select_face_by_sides(number=4, type='GREATER')
 
         return {'FINISHED'}
 

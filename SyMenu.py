@@ -70,6 +70,7 @@ class SY_MT_SyMenu(bpy.types.Menu):
             layout.label(text="Select")
             layout.separator()
             layout.operator("mesh.region_to_loop")
+            layout.operator("mesh.sy_find_ngons")
 
             #Edit
             layout.separator()
