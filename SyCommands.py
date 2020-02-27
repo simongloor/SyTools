@@ -500,7 +500,7 @@ class SY_OT_SyEdgeIntersection(bpy.types.Operator):
             return
 
         point = line[0].lerp(line[1], 0.5)
-        context.scene.cursor_location = obj.matrix_world * point
+        context.scene.cursor.location = obj.matrix_world @ point
         bpy.ops.mesh.merge(type='CURSOR', uvs=False)
         return {'FINISHED'}
 
