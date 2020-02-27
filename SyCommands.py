@@ -687,40 +687,31 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
         #Save active object
         obj = context.active_object
 
-        # #Get selected vertices
-        # Mesh = bmesh.from_edit_mesh(obj.data)
-        # verts = [ v.index for v in Mesh.verts if v.select ]
-
-        #Get selected vertices (globally)
-        Mesh = bmesh.from_edit_mesh(obj.data)
-        verts = Mesh.verts
-
         # #Get selected vertices (locally)
-        # Mesh = bmesh.from_edit_mesh(obj.data)
-        # verts = [vert.co for vert in Mesh.verts]
-
-        plain_verts = [vert.to_tuple() for vert in verts]
+        bm = bmesh.from_edit_mesh(obj.data)
+        verts = [v for v in bm.verts if v.select]
 
         #Find extent
-        Max_X = sys.float_info.min
+        Max_X = -sys.float_info.max
         Min_X = sys.float_info.max
-        Max_Y = sys.float_info.min
+        Max_Y = -sys.float_info.max
         Min_Y = sys.float_info.max
-        Max_Z = sys.float_info.min
+        Max_Z = -sys.float_info.max
         Min_Z = sys.float_info.max
-        for vert in plain_verts:
-            if vert[0] > Max_X:
-                Max_X = vert_Tuple[0]
-            if vert[0] < Min_X:
-                Min_X = vert_Tuple[0]
-            if vert[1] > Max_Y:
-                Max_Y = vert_Tuple[1]
-            if vert[1] < Min_Y:
-                Min_Y = vert_Tuple[1]
-            if vert[2] > Max_Z:
-                Max_Z = vert_Tuple[2]
-            if vert[2] < Min_Z:
-                Min_Z = vert_Tuple[2]
+        for vert in verts:
+            co_final = obj.matrix_world @ vert.co
+            if co_final[0] > Max_X:
+                Max_X = co_final[0]
+            if co_final[0] < Min_X:
+                Min_X = co_final[0]
+            if co_final[1] > Max_Y:
+                Max_Y = co_final[1]
+            if co_final[1] < Min_Y:
+                Min_Y = co_final[1]
+            if co_final[2] > Max_Z:
+                Max_Z = co_final[2]
+            if co_final[2] < Min_Z:
+                Min_Z = co_final[2]
 
         #leave the active object
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -735,9 +726,7 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
         bound_box.location[0] = (Min_X + Max_X) / 2
         bound_box.location[1] = (Min_Y + Max_Y) / 2
         bound_box.location[2] = (Min_Z + Max_Z) / 2
-        bound_box.dimensions[0] = Max_X - Min_X
-        bound_box.dimensions[1] = Max_Y - Min_Y
-        bound_box.dimensions[2] = Max_Z - Min_Z
+        bound_box.dimensions = Max_X - Min_X, Max_Y - Min_Y, Max_Z - Min_Z
         #bound_box.rotation_euler = obj.rotation_euler
 
         #rename
@@ -749,7 +738,9 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
 
         #return to initial state
         bpy.ops.object.select_all(action='DESELECT')
+        bound_box.select_set(state=False)
         obj.select_set(state=True)
+        bpy.context.view_layer.objects.active = obj
         bpy.ops.object.mode_set(mode='EDIT')
 
         return {'FINISHED'}
