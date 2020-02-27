@@ -235,7 +235,7 @@ class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
         bpy.data.objects['SkyboxCam.005'].select = True
         bpy.data.objects['SkyboxCam.006'].select = True
         bpy.data.objects['SkyboxCam.000'].select = True
-        bpy.context.scene.objects.active = bpy.data.objects['SkyboxCam.000']
+        bpy.context.view_layer.objects.active = bpy.data.objects['SkyboxCam.000']
         bpy.ops.object.parent_set(type='OBJECT')
 
 
@@ -245,7 +245,7 @@ class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
         bpy.context.scene.frame_current = 1
         bpy.ops.marker.add()
         bpy.context.area.type = 'VIEW_3D'
-        bpy.context.scene.objects.active = bpy.data.objects['SkyboxCam.001']
+        bpy.context.view_layer.objects.active = bpy.data.objects['SkyboxCam.001']
         bpy.ops.view3d.object_as_camera()
         bpy.context.area.type = 'TIMELINE'
         bpy.ops.marker.camera_bind()
@@ -253,7 +253,7 @@ class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
         bpy.context.scene.frame_current = 2
         bpy.ops.marker.add()
         bpy.context.area.type = 'VIEW_3D'
-        bpy.context.scene.objects.active = bpy.data.objects['SkyboxCam.002']
+        bpy.context.view_layer.objects.active = bpy.data.objects['SkyboxCam.002']
         bpy.ops.view3d.object_as_camera()
         bpy.context.area.type = 'TIMELINE'
         bpy.ops.marker.camera_bind()
@@ -261,7 +261,7 @@ class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
         bpy.context.scene.frame_current = 3
         bpy.ops.marker.add()
         bpy.context.area.type = 'VIEW_3D'
-        bpy.context.scene.objects.active = bpy.data.objects['SkyboxCam.003']
+        bpy.context.view_layer.objects.active = bpy.data.objects['SkyboxCam.003']
         bpy.ops.view3d.object_as_camera()
         bpy.context.area.type = 'TIMELINE'
         bpy.ops.marker.camera_bind()
@@ -269,7 +269,7 @@ class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
         bpy.context.scene.frame_current = 4
         bpy.ops.marker.add()
         bpy.context.area.type = 'VIEW_3D'
-        bpy.context.scene.objects.active = bpy.data.objects['SkyboxCam.004']
+        bpy.context.view_layer.objects.active = bpy.data.objects['SkyboxCam.004']
         bpy.ops.view3d.object_as_camera()
         bpy.context.area.type = 'TIMELINE'
         bpy.ops.marker.camera_bind()
@@ -277,7 +277,7 @@ class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
         bpy.context.scene.frame_current = 5
         bpy.ops.marker.add()
         bpy.context.area.type = 'VIEW_3D'
-        bpy.context.scene.objects.active = bpy.data.objects['SkyboxCam.005']
+        bpy.context.view_layer.objects.active = bpy.data.objects['SkyboxCam.005']
         bpy.ops.view3d.object_as_camera()
         bpy.context.area.type = 'TIMELINE'
         bpy.ops.marker.camera_bind()
@@ -285,7 +285,7 @@ class SY_OT_SyCreateSkyboxCam(bpy.types.Operator):
         bpy.context.scene.frame_current = 6
         bpy.ops.marker.add()
         bpy.context.area.type = 'VIEW_3D'
-        bpy.context.scene.objects.active = bpy.data.objects['SkyboxCam.006']
+        bpy.context.view_layer.objects.active = bpy.data.objects['SkyboxCam.006']
         bpy.ops.view3d.object_as_camera()
         bpy.context.area.type = 'TIMELINE'
         bpy.ops.marker.camera_bind()
@@ -400,7 +400,47 @@ class SY_OT_SyMoveSelectionToZero(bpy.types.Operator):
 
         return {'FINISHED'}
 
+#************************************************************************************
+# Move Selection to Zero
+class SY_OT_FindNgons(bpy.types.Operator):
+    bl_idname = "object.sy_find_ngons"
+    bl_label = "Find Ngons (Sy)"
+    bl_description = "Searches all selected objects for faces with more than 4 sides."
 
+    def execute(self, context):
+
+        #Iterate through Objects
+        InitiallySelectedObjects = bpy.context.selected_objects
+        if len(InitiallySelectedObjects) > 0:
+            for iObject in InitiallySelectedObjects:
+
+                #Set Object Active
+                bpy.context.view_layer.objects.active = iObject
+
+                #Enter EditMode
+                bpy.ops.object.mode_set(mode='EDIT')
+
+                #Deselect all
+                bpy.ops.mesh.select_all(action='DESELECT')
+
+                #Select ngons
+                bpy.ops.mesh.select_face_by_sides(number=4, type='GREATER')
+
+                #Is anything selected?
+                Mesh = bmesh.from_edit_mesh(iObject.data)
+                SelectedVertices = [ v.index for v in Mesh.verts if v.select ]
+                CountSelectedVertices = len(SelectedVertices)
+                if(CountSelectedVertices > 0):
+                    #Abort
+                    return
+
+                #Enter ObjectMode
+                bpy.ops.object.mode_set(mode='OBJECT')
+
+        #Deselect to give user feedback
+        #bpy.ops.object.select_all(action='DESELECT')
+
+        return {'FINISHED'}
 
 #************************************************************************************
 # Fix the Rotation to match Unity
@@ -429,7 +469,6 @@ class SY_OT_SyFixRotation(bpy.types.Operator):
         bpy.context.space_data.pivot_point = OldPivotOption
 
         return {'FINISHED'}
-
 
 #************************************************************************************
 # Dissolve Edge completely

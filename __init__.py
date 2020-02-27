@@ -45,6 +45,7 @@ classes = (
     SyCommands.SY_OT_SyEdgeIntersection,
     SyCommands.SY_OT_Weight2VertexCol,
     SyCommands.SY_OT_SySeamBorder,
+    SyCommands.SY_OT_FindNgons,
     SyMenu.SY_MT_SyMenu,
     SyPanel.SY_PT_sy_panel_ui,
     # SyNormals.SY_PT_vertex_normals_ui,
