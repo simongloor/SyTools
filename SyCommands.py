@@ -2,6 +2,7 @@
 
 # ***********************************************************************************************************************
 
+import sys
 import bpy
 import mathutils
 from mathutils import Vector
@@ -632,5 +633,141 @@ class SY_OT_SySeamBorder(bpy.types.Operator):
         # load selection
         bpy.ops.object.vertex_group_select()
         bpy.ops.object.vertex_group_remove()
+
+        return {'FINISHED'}
+
+
+#************************************************************************************
+# Create Bounds
+
+class SY_OT_SyCreateBounds_FromObjects(bpy.types.Operator):
+    bl_idname = "object.sy_create_bounds_from_objects"
+    bl_label = "Create Bounding Boxes from Objects (Sy)"
+    bl_description = "Create a BoundingBox for each selected Object"
+
+    def execute(self, context):
+
+        selected = bpy.context.selected_objects
+
+        for obj in selected:
+            #ensure origin is centered on bounding box center
+            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+            #create a cube for the bounding box
+            bpy.ops.mesh.primitive_cube_add()
+            #our new cube is now the active object, so we can keep track of it in a variable:
+            bound_box = bpy.context.active_object
+
+            #copy transforms
+            bound_box.dimensions = obj.dimensions
+            bound_box.location = obj.location
+            bound_box.rotation_euler = obj.rotation_euler
+
+            #rename
+            bound_box.name = "UBX_" + bound_box.name + "_.000"
+
+            #display as collision
+            bpy.context.object.display_type = 'WIRE'
+            bpy.context.object.show_in_front = True
+
+        #select old
+        bpy.ops.object.select_all(action='DESELECT')
+        for obj in selected:
+            obj.select_set(state=True)
+
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+
+class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
+    bl_idname = "object.sy_create_bounds_from_vertices"
+    bl_label = "Create Bounding Boxes from Vertices (Sy)"
+    bl_description = "Create a BoundingBox along that envelopes the selected vertices"
+
+    def execute(self, context):
+        #Save active object
+        obj = context.active_object
+
+        # #Get selected vertices
+        # Mesh = bmesh.from_edit_mesh(obj.data)
+        # verts = [ v.index for v in Mesh.verts if v.select ]
+
+        #Get selected vertices (globally)
+        Mesh = bmesh.from_edit_mesh(obj.data)
+        verts = Mesh.verts
+
+        # #Get selected vertices (locally)
+        # Mesh = bmesh.from_edit_mesh(obj.data)
+        # verts = [vert.co for vert in Mesh.verts]
+
+        plain_verts = [vert.to_tuple() for vert in verts]
+
+        #Find extent
+        Max_X = sys.float_info.min
+        Min_X = sys.float_info.max
+        Max_Y = sys.float_info.min
+        Min_Y = sys.float_info.max
+        Max_Z = sys.float_info.min
+        Min_Z = sys.float_info.max
+        for vert in plain_verts:
+            if vert[0] > Max_X:
+                Max_X = vert_Tuple[0]
+            if vert[0] < Min_X:
+                Min_X = vert_Tuple[0]
+            if vert[1] > Max_Y:
+                Max_Y = vert_Tuple[1]
+            if vert[1] < Min_Y:
+                Min_Y = vert_Tuple[1]
+            if vert[2] > Max_Z:
+                Max_Z = vert_Tuple[2]
+            if vert[2] < Min_Z:
+                Min_Z = vert_Tuple[2]
+
+        #leave the active object
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.select_all(action='DESELECT')
+
+        #create a cube for the bounding box
+        bpy.ops.mesh.primitive_cube_add()
+        #our new cube is now the active object, so we can keep track of it in a variable:
+        bound_box = bpy.context.active_object
+
+        #copy transforms
+        bound_box.location[0] = (Min_X + Max_X) / 2
+        bound_box.location[1] = (Min_Y + Max_Y) / 2
+        bound_box.location[2] = (Min_Z + Max_Z) / 2
+        bound_box.dimensions[0] = Max_X - Min_X
+        bound_box.dimensions[1] = Max_Y - Min_Y
+        bound_box.dimensions[2] = Max_Z - Min_Z
+        #bound_box.rotation_euler = obj.rotation_euler
+
+        #rename
+        bound_box.name = "UBX_" + obj.name + "_.000"
+
+        #display as collision
+        bpy.context.object.display_type = 'WIRE'
+        bpy.context.object.show_in_front = True
+
+        #return to initial state
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(state=True)
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        return {'FINISHED'}
+
+#************************************************************************************
+# Split from bound selection
+
+class SY_OT_SySplitBounds(bpy.types.Operator):
+    bl_idname = "object.sy_split_bounds"
+    bl_label = "Split along Seam (Sy)"
+
+    def execute(self, context):
+
+        bpy.ops.mesh.rip('INVOKE_DEFAULT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.edge_face_add()
+        bpy.ops.mesh.f2()
+        bpy.ops.mesh.separate(type='LOOSE')
+        bpy.ops.object.mode_set(mode='OBJECT')
 
         return {'FINISHED'}

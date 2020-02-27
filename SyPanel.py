@@ -46,3 +46,14 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row = col.row(align=True)
         row.operator('mesh.normals_make_consistent', text = 'Recalculate')
         row.operator('mesh.flip_normals', text = 'Flip Direction')
+
+        #Collision
+        box = self.layout.box()
+        box.label(text='Collision')
+        col = box.column(align=True)
+        row = col.row(align=True)
+        row.operator('object.sy_create_bounds_from_objects', text = 'Bounds from Objects')
+        row = col.row(align=True)
+        row.operator('object.sy_create_bounds_from_vertices', text = 'Bounds from Vertices')
+        row = col.row(align=True)
+        row.operator('object.sy_split_bounds', text = 'Split Bounds')
