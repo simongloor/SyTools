@@ -762,3 +762,93 @@ class SY_OT_SySplitBounds(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
 
         return {'FINISHED'}
+
+
+#************************************************************************************
+# UV Origin Operations
+
+class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
+    bl_idname = "object.sy_apply_uv_origin"
+    bl_label = "Apply UV-Origin (Sy)"
+    bl_description = "Remaps all first UV channels of the selected Objects.\nIf an object is selected as origin it is used. Otherwise the closest Object with the name \"UV_Origin.***\" is used."
+
+    def execute(self, context):
+
+        #get origin
+        origin = context.window_manager.SpecificUVOrigin
+        mat_origin = mathutils.Matrix.identity
+        if origin:
+            mat_origin = origin.matrix_world.inverted()
+        rot_origin = mat_origin.to_quaternion()
+
+        #iterate over selected objects
+        selected = bpy.context.selected_objects
+        for obj in selected:
+            for face in obj.data.polygons:
+
+                #gather object transform
+                mat_obj = obj.matrix_world
+                rot_obj = mat_obj.to_quaternion()
+
+                #gather normal data
+                nor_obj_space = face.normal
+                nor_world_space = rot_obj @ nor_obj_space
+                tan_world_space = mathutils.Vector.cross(nor_world_space, (0.0, 0.0, 1.0))
+
+                nor_origin_space = rot_origin @ nor_world_space
+                tan_origin_space = rot_origin @ tan_world_space
+
+                #evaluate normal
+                poly_is_vertical = abs(nor_origin_space[2]) < 0.8
+
+                #iterate over vertices
+                for vert_idx, loop_idx in zip(face.vertices, face.loop_indices):
+                    #uv_coords = obj.data.uv_layers.active.data[loop_idx].uv
+                    #print("face idx: %i, vert idx: %i, uvs: %f, %f" % (face.index, vert_idx, uv_coords.x, uv_coords.y))
+
+                    #Gather location data
+                    vert = obj.data.vertices[vert_idx]
+                    vert_world_space = obj.matrix_world @ vert.co
+
+                    #Calculate new coords
+                    vert_origin_space = mat_origin @ vert_world_space
+                    vert_x_tangent_space = -mathutils.Vector.dot(vert_origin_space, tan_origin_space)
+
+                    #is_vertical = vert_final.
+                    if poly_is_vertical:
+                        uv_coords = (vert_x_tangent_space, vert_origin_space[2])
+                    else:
+                        uv_coords = (vert_origin_space[0], vert_origin_space[1])
+
+                    #Apply
+                    obj.data.uv_layers.active.data[loop_idx].uv = uv_coords
+
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+
+class SY_OT_SyRefreshUVOrigin(bpy.types.Operator):
+    bl_idname = "object.sy_refresh_uv_origin"
+    bl_label = "Refresh UV-Origin (Sy)"
+    bl_description = "Remaps all first UV channels of the selected Objects that already have an assigned Origin."
+
+    def execute(self, context):
+
+
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+
+class SY_OT_SyAddUVOrigin(bpy.types.Operator):
+    bl_idname = "object.sy_add_uv_origin"
+    bl_label = "Add UV-Origin (Sy)"
+    bl_description = "Creates a UV-Origin.\nPlace and rotate it to define the origin of the UV.\nIt is also immediately set as specific origin."
+
+    def execute(self, context):
+
+        #bpy.ops.object.empty_add(type='CONE', align='WORLD', location=(bpy.context.scene.cursor.location), rotation=(1.5708, 0, 0))
+        bpy.ops.object.empty_add(type='ARROWS', location=bpy.context.scene.cursor.location)
+        bpy.context.active_object.name = "UV_Origin.000"
+        context.window_manager.SpecificUVOrigin = bpy.context.active_object
+
+        return {'FINISHED'}

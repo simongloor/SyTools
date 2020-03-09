@@ -1,6 +1,3 @@
-# Copyright | Pillars of SY (Simon Gloor) | 2018 | All Rights Reserved
-
-# ***********************************************************************************************************************
 
 import bpy
 import mathutils
@@ -47,6 +44,7 @@ class SY_MT_SyMenu(bpy.types.Menu):
             layout.separator()
             layout.label(text="Snap n Pivot")
             layout.separator()
+            layout.operator("view3d.snap_cursor_to_selected")
             layout.operator("object.sy_set_cursor_pivot")
 
             #Clean
