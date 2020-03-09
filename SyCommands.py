@@ -892,8 +892,13 @@ class SY_OT_SyPreviewUV(bpy.types.Operator):
 
     def execute(self, context):
 
+        #Create Material
+        bpy.data.materials.new(name="MaterialName")
+
         selected = bpy.context.selected_objects
         for obj in selected:
-            
+            bpy.context.object.active_material_index = 0
+            bpy.ops.material.new()
+
 
         return {'FINISHED'}
