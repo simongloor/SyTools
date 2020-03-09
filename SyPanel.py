@@ -66,26 +66,23 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row = col.row(align=True)
         row.operator('object.sy_add_uv_origin', text = 'Add Origin')
         row = col.row(align=True)
-        row.prop(context.window_manager, 'SpecificUVOrigin', text = 'specific origin')
-        row = col.row(align=True)
         row.operator('object.sy_apply_uv_origin', text = 'Apply')
-        row.operator('object.sy_refresh_uv_origin', text = 'Refresh')
 
 #************************************************************************************
 
-# init properties
-def init_properties():
-
-    bpy.types.WindowManager.SpecificUVOrigin = bpy.props.PointerProperty(name="Specific UV-Origin", type=bpy.types.Object)
-
-# clear properties
-def clear_properties():
-    props = ['RunAutoImport', 'RenameFile', 'RunMoveToCenter', 'RunUnparent', 'RunRename', 'RunClean', 'RunModifiers', 'TargetDecimateCount', 'RunRewrapT', 'RunRewrapL', 'RunIslands', 'RunPackT', 'RunPackL', 'PackSize', 'PackRotate', 'OldRewrapT', 'OldRewrapL', 'OldIsland', 'RunExportFBX', 'ExportAnim', 'CurveLength']
-    for p in props:
-        if bpy.context.window_manager.get(p) != None:
-            del bpy.context.window_manager[p]
-        try:
-            x = getattr(bpy.types.WindowManager, p)
-            del x
-        except:
-            pass
+# # init properties
+# def init_properties():
+#
+#     # bpy.types.WindowManager.SpecificUVOrigin = bpy.props.PointerProperty(name="Specific UV-Origin", type=bpy.types.Object)
+#
+# # clear properties
+# def clear_properties():
+#     props = ['RunAutoImport', 'RenameFile', 'RunMoveToCenter', 'RunUnparent', 'RunRename', 'RunClean', 'RunModifiers', 'TargetDecimateCount', 'RunRewrapT', 'RunRewrapL', 'RunIslands', 'RunPackT', 'RunPackL', 'PackSize', 'PackRotate', 'OldRewrapT', 'OldRewrapL', 'OldIsland', 'RunExportFBX', 'ExportAnim', 'CurveLength']
+#     for p in props:
+#         if bpy.context.window_manager.get(p) != None:
+#             del bpy.context.window_manager[p]
+#         try:
+#             x = getattr(bpy.types.WindowManager, p)
+#             del x
+#         except:
+#             pass

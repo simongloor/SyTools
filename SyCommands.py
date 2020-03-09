@@ -774,21 +774,35 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
 
     def execute(self, context):
 
-        #get origin
-        origin = context.window_manager.SpecificUVOrigin
-        mat_origin = mathutils.Matrix.identity
-        if origin:
-            mat_origin = origin.matrix_world.inverted()
-        rot_origin = mat_origin.to_quaternion()
-
-        #iterate over selected objects
+        #find origin
+        origin = None
         selected = bpy.context.selected_objects
         for obj in selected:
+            if obj.name[:9] == "UV_Origin":
+                origin = obj
+                break
 
-            #store origin?
-            if origin:
-                # obj.UVOrigin = bpy.props.PointerProperty(name="UV Origin", type=bpy.types.Object)
+        #iterate over selected objects
+        for obj in selected:
+
+            #skip origin
+            if obj.name[:9] == "UV_Origin":
+                break
+
+            #store or read origin
+            if origin != None:
+                #store origin
                 obj["UVOrigin"] = origin
+            elif obj.get('UVOrigin') is not None:
+            # elif hasattr(obj, "UVOrigin"):
+                #read origin?
+                origin = obj["UVOrigin"]
+
+            #get origin transformation
+            mat_origin = mathutils.Matrix()
+            if origin != None:
+                mat_origin = origin.matrix_world.inverted()
+            rot_origin = mat_origin.to_quaternion()
 
             #iterate over polys
             for face in obj.data.polygons:
@@ -834,18 +848,6 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
 
 #------------------------------------------------------------------------------------
 
-class SY_OT_SyRefreshUVOrigin(bpy.types.Operator):
-    bl_idname = "object.sy_refresh_uv_origin"
-    bl_label = "Refresh UV-Origin (Sy)"
-    bl_description = "Remaps all first UV channels of the selected Objects that already have an assigned Origin."
-
-    def execute(self, context):
-
-
-        return {'FINISHED'}
-
-#------------------------------------------------------------------------------------
-
 class SY_OT_SyAddUVOrigin(bpy.types.Operator):
     bl_idname = "object.sy_add_uv_origin"
     bl_label = "Add UV-Origin (Sy)"
@@ -856,6 +858,5 @@ class SY_OT_SyAddUVOrigin(bpy.types.Operator):
         #bpy.ops.object.empty_add(type='CONE', align='WORLD', location=(bpy.context.scene.cursor.location), rotation=(1.5708, 0, 0))
         bpy.ops.object.empty_add(type='SPHERE', location=bpy.context.scene.cursor.location)
         bpy.context.active_object.name = "UV_Origin.000"
-        context.window_manager.SpecificUVOrigin = bpy.context.active_object
 
         return {'FINISHED'}

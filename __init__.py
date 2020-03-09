@@ -51,7 +51,6 @@ classes = (
     SyCommands.SY_OT_SySplitBounds,
     SyCommands.SY_OT_SyAddUVOrigin,
     SyCommands.SY_OT_SyApplyUVOrigin,
-    SyCommands.SY_OT_SyRefreshUVOrigin,
     SyMenu.SY_MT_SyMenu,
     SyPanel.SY_PT_sy_panel_ui,
     # SyNormals.SY_PT_vertex_normals_ui,
@@ -75,13 +74,13 @@ classes = (
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    SyPanel.init_properties()
+    # SyPanel.init_properties()
     # SyNormals.init_properties()
 
 def unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-    SyPanel.clear_properties()
+    # SyPanel.clear_properties()
     # SyNormals.clear_properties()
 
 def draw_item(self, context):
