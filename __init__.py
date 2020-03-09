@@ -51,6 +51,7 @@ classes = (
     SyCommands.SY_OT_SySplitBounds,
     SyCommands.SY_OT_SyAddUVOrigin,
     SyCommands.SY_OT_SyApplyUVOrigin,
+    SyCommands.SY_OT_SyPreviewUV,
     SyMenu.SY_MT_SyMenu,
     SyPanel.SY_PT_sy_panel_ui,
     # SyNormals.SY_PT_vertex_normals_ui,

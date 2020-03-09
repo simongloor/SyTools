@@ -882,3 +882,18 @@ class SY_OT_SyAddUVOrigin(bpy.types.Operator):
         bpy.context.active_object.name = "UV_Origin.000"
 
         return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+
+class SY_OT_SyPreviewUV(bpy.types.Operator):
+    bl_idname = "object.sy_preview_uv"
+    bl_label = "Preview UV (Sy)"
+    bl_description = "Replaces all materials with a preview material. The materials will be stored in the custom properties."
+
+    def execute(self, context):
+
+        selected = bpy.context.selected_objects
+        for obj in selected:
+            
+
+        return {'FINISHED'}
