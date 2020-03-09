@@ -784,6 +784,13 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
         #iterate over selected objects
         selected = bpy.context.selected_objects
         for obj in selected:
+
+            #store origin?
+            if origin:
+                # obj.UVOrigin = bpy.props.PointerProperty(name="UV Origin", type=bpy.types.Object)
+                obj["UVOrigin"] = origin
+
+            #iterate over polys
             for face in obj.data.polygons:
 
                 #gather object transform
@@ -847,7 +854,7 @@ class SY_OT_SyAddUVOrigin(bpy.types.Operator):
     def execute(self, context):
 
         #bpy.ops.object.empty_add(type='CONE', align='WORLD', location=(bpy.context.scene.cursor.location), rotation=(1.5708, 0, 0))
-        bpy.ops.object.empty_add(type='ARROWS', location=bpy.context.scene.cursor.location)
+        bpy.ops.object.empty_add(type='SPHERE', location=bpy.context.scene.cursor.location)
         bpy.context.active_object.name = "UV_Origin.000"
         context.window_manager.SpecificUVOrigin = bpy.context.active_object
 
