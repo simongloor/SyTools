@@ -57,9 +57,9 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row.operator('object.sy_split_bounds', text = 'Split Bounds')
 
         #UV
-        box = self.layout.box()
-        box.label(text='UV')
-        box = box.box()
+        uvbox = self.layout.box()
+        uvbox.label(text='UV')
+        box = uvbox.box()
         box.label(text='UV from Origin')
 
         col = box.column(align=True)
@@ -67,6 +67,12 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row.operator('object.sy_add_uv_origin', text = 'Add Origin')
         row = col.row(align=True)
         row.operator('object.sy_apply_uv_origin', text = 'Apply')
+
+        box = uvbox
+        col = box.column(align=True)
+        row = col.row(align=True)
+        row.operator('object.sy_preview_uv', text = 'Toggle Preview')
+
 
 #************************************************************************************
 

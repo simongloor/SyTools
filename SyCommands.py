@@ -891,14 +891,42 @@ class SY_OT_SyPreviewUV(bpy.types.Operator):
     bl_description = "Replaces all materials with a preview material. The materials will be stored in the custom properties."
 
     def execute(self, context):
+        #Attributes
+        mat_name = "UV_Preview"
+        mat_preview = None
+
+        #Find Material
+        for mat in bpy.data.materials:
+            if mat.name == mat_name:
+                mat_preview = mat
+                break
 
         #Create Material
-        bpy.data.materials.new(name="MaterialName")
+        if mat_preview == None:
+            mat_preview = bpy.data.materials.new(name = mat_name)
+            mat_preview.use_nodes = True
+            bsdf = mat_preview.node_tree.nodes["Principled BSDF"]
+            texImage = mat_preview.node_tree.nodes.new('ShaderNodeTexImage')
+            texImage.image = bpy.ops.image.new(name="Color Grid", width=1024, height=1024, generated_type="COLOR_GRID")
+            mat_preview.node_tree.links.new(bsdf.inputs['Base Color'], texImage.outputs['Color'])
 
+        #Iterate over material slots of objects
         selected = bpy.context.selected_objects
         for obj in selected:
-            bpy.context.object.active_material_index = 0
-            bpy.ops.material.new()
 
+            for i in range(len(obj.material_slots)):
+                slot_name = "MatPrev_%02d" % (i,)
+
+                #toggle
+                if obj.material_slots[i].material == mat_preview:
+                    #reapply original material
+                    obj.material_slots[i].material = obj[slot_name]
+                else:
+                    #apply preview material
+                    obj[slot_name] = obj.material_slots[i].material
+                    obj.material_slots[i].material = mat_preview
 
         return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
