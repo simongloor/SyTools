@@ -903,14 +903,24 @@ class SY_OT_SyPreviewUV(bpy.types.Operator):
 
         #Create Material
         if mat_preview == None:
+            #create texture
+            color_grid = None
+            texture_name = "ColorGrid"
+            bpy.ops.image.new(name=texture_name, width=1024, height=1024, generated_type="COLOR_GRID")
+            for img in bpy.data.images:
+                if img.name == texture_name:
+                    color_grid = img
+
+            #create material
             mat_preview = bpy.data.materials.new(name = mat_name)
             mat_preview.use_nodes = True
             bsdf = mat_preview.node_tree.nodes["Principled BSDF"]
-            texImage = mat_preview.node_tree.nodes.new('ShaderNodeTexImage')
-            texImage.image = bpy.ops.image.new(name="Color Grid", width=1024, height=1024, generated_type="COLOR_GRID")
-            mat_preview.node_tree.links.new(bsdf.inputs['Base Color'], texImage.outputs['Color'])
+            image_node = mat_preview.node_tree.nodes.new('ShaderNodeTexImage')
+            image_node.image = color_grid
+            mat_preview.node_tree.links.new(bsdf.inputs['Base Color'], image_node.outputs['Color'])
 
         #Iterate over material slots of objects
+        enabled_preview = False
         selected = bpy.context.selected_objects
         for obj in selected:
 
@@ -925,6 +935,10 @@ class SY_OT_SyPreviewUV(bpy.types.Operator):
                     #apply preview material
                     obj[slot_name] = obj.material_slots[i].material
                     obj.material_slots[i].material = mat_preview
+                    enabled_preview = True
+
+        if enabled_preview:
+            bpy.context.space_data.shading.type = 'MATERIAL'
 
         return {'FINISHED'}
 
