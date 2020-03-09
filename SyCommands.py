@@ -779,6 +779,7 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
         selected = bpy.context.selected_objects
         for obj in selected:
             if obj.name[:9] == "UV_Origin":
+                print("DEBUG: found origin")
                 origin = obj
                 break
 
@@ -787,15 +788,18 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
 
             #skip origin
             if obj.name[:9] == "UV_Origin":
-                break
+                print("DEBUG: skipping the object as it is an origin")
+                continue
+            else:
+                print("DEBUG: processing object")
 
             #store or read origin
             if origin != None:
-                #store origin
+                print("DEBUG: saving origin to object")
                 obj["UVOrigin"] = origin
+
             elif obj.get('UVOrigin') is not None:
-            # elif hasattr(obj, "UVOrigin"):
-                #read origin?
+                print("DEBUG: reading origin from object")
                 origin = obj["UVOrigin"]
 
             #get origin transformation
@@ -819,6 +823,22 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
                 nor_origin_space = rot_origin @ nor_world_space
                 tan_origin_space = rot_origin @ tan_world_space
 
+                #flip tangent?
+                flip_tangent = False
+                tan_oriented_origin_space = tan_origin_space #(abs(tan_origin_space[0]), abs(tan_origin_space[1]), abs(tan_origin_space[2]))
+                if abs(tan_origin_space[0]) > abs(tan_origin_space[1]):
+                    #flows right
+                    if(tan_origin_space[0] < 0.0):
+                        flip_tangent = True
+                else:
+                    #flows up
+                    if(tan_origin_space[1] < 0.0):
+                        flip_tangent = True
+
+                #flip if required
+                if flip_tangent:
+                    tan_oriented_origin_space = (-tan_origin_space[0], -tan_origin_space[1], tan_origin_space[2])
+
                 #evaluate normal
                 poly_is_vertical = abs(nor_origin_space[2]) < 0.8
 
@@ -833,7 +853,7 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
 
                     #Calculate new coords
                     vert_origin_space = mat_origin @ vert_world_space
-                    vert_x_tangent_space = -mathutils.Vector.dot(vert_origin_space, tan_origin_space)
+                    vert_x_tangent_space = mathutils.Vector.dot(vert_origin_space, tan_oriented_origin_space)
 
                     #is_vertical = vert_final.
                     if poly_is_vertical:
@@ -842,6 +862,8 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
                         uv_coords = (vert_origin_space[0], vert_origin_space[1])
 
                     #Apply
+                    if obj.data.uv_layers.active == None:
+                        obj.data.uv_layers.new(name = "Texture")
                     obj.data.uv_layers.active.data[loop_idx].uv = uv_coords
 
         return {'FINISHED'}
