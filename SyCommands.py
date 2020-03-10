@@ -790,13 +790,14 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
                 print("DEBUG: processing object")
 
             #store or read origin
+            origin_property_name = "UVOrigin"
             if origin != None:
                 print("DEBUG: saving origin to object")
-                obj["UVOrigin"] = origin
+                obj[origin_property_name] = origin
 
-            elif obj.get('UVOrigin') is not None:
+            elif obj.get(origin_property_name) is not None:
                 print("DEBUG: reading origin from object")
-                origin = obj["UVOrigin"]
+                origin = obj[origin_property_name]
 
             #get origin transformation
             mat_origin = mathutils.Matrix()
@@ -923,12 +924,20 @@ class SY_OT_SyPreviewUV(bpy.types.Operator):
             for i in range(len(obj.material_slots)):
                 slot_name = "MatPrev_%02d" % (i,)
 
-                #toggle
-                if obj.material_slots[i].material == mat_preview:
-                    #reapply original material
+                #toggle?
+                applied_material_is_preview = obj.material_slots[i].material == mat_preview
+                has_restorable_material = obj.get(slot_name) is not None
+
+                enable_preview = not applied_material_is_preview
+                restore_material = applied_material_is_preview and has_restorable_material
+
+                #reapply original material?
+                if restore_material:
                     obj.material_slots[i].material = obj[slot_name]
-                else:
-                    #apply preview material
+                    del obj[slot_name]
+
+                #apply preview material?
+                if enable_preview:
                     obj[slot_name] = obj.material_slots[i].material
                     obj.material_slots[i].material = mat_preview
                     enabled_preview = True
