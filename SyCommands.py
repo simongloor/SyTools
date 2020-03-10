@@ -766,7 +766,7 @@ class SY_OT_SySplitBounds(bpy.types.Operator):
 class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
     bl_idname = "object.sy_apply_uv_origin"
     bl_label = "Apply UV-Origin (Sy)"
-    bl_description = "Remaps all first UV channels of the selected Objects.\nIf an object is selected as origin it is used. Otherwise the closest Object with the name \"UV_Origin.***\" is used."
+    bl_description = "Remaps all first UV channels of the selected Objects.\nIf an origin is selected, it will be applied and saved into the selected objects.\nIf no origin is selected, the saved origin or the world origin is used."
 
     def execute(self, context):
 
@@ -870,7 +870,7 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
 class SY_OT_SyAddUVOrigin(bpy.types.Operator):
     bl_idname = "object.sy_add_uv_origin"
     bl_label = "Add UV-Origin (Sy)"
-    bl_description = "Creates a UV-Origin.\nPlace and rotate it to define the origin of the UV.\nIt is also immediately set as specific origin."
+    bl_description = "Creates a UV-Origin.\nPlace and rotate it to define the origin of the UV."
 
     def execute(self, context):
 
@@ -885,7 +885,7 @@ class SY_OT_SyAddUVOrigin(bpy.types.Operator):
 class SY_OT_SyPreviewUV(bpy.types.Operator):
     bl_idname = "object.sy_preview_uv"
     bl_label = "Preview UV (Sy)"
-    bl_description = "Replaces all materials with a preview material. The materials will be stored in the custom properties."
+    bl_description = "Switches between the applied materials and a preview material.\nThe materials will be stored in the custom properties."
 
     def execute(self, context):
         #Attributes
