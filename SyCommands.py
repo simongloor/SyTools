@@ -1,7 +1,3 @@
-# Copyright | Pillars of SY (Simon Gloor) | 2018 | All Rights Reserved
-
-# ***********************************************************************************************************************
-
 import sys
 import bpy
 import mathutils
