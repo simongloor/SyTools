@@ -882,7 +882,7 @@ class SY_OT_SyApplyUVOrigin(bpy.types.Operator):
                     #Apply
                     if obj.data.uv_layers.active == None:
                         obj.data.uv_layers.new(name = "Texture")
-                    obj.data.uv_layers.active.data[loop_idx].uv = uv_coords
+                    obj.data.uv_layers[0].data[loop_idx].uv = uv_coords
 
         return {'FINISHED'}
 
