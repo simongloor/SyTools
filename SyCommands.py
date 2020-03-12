@@ -683,6 +683,9 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
         #Save active object
         obj = context.active_object
 
+        #Get the active space
+        active_space = bpy.context.scene.transform_orientation_slots[0]
+
         # #Get selected vertices (locally)
         bm = bmesh.from_edit_mesh(obj.data)
         verts = [v for v in bm.verts if v.select]
@@ -695,8 +698,13 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
         Max_Z = -sys.float_info.max
         Min_Z = sys.float_info.max
         for vert in verts:
-            #co_final = obj.matrix_world @ vert.co
-            co_final = vert.co
+            #Get coordinate
+            if active_space.type == 'GLOBAL':
+                co_final = obj.matrix_world @ vert.co
+            if active_space.type == 'LOCAL':
+                co_final = vert.co
+
+            #Get bounding box
             if co_final[0] > Max_X:
                 Max_X = co_final[0]
             if co_final[0] < Min_X:
@@ -719,11 +727,24 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
         #our new cube is now the active object, so we can keep track of it in a variable:
         bound_box = bpy.context.active_object
 
-        #copy transforms
+        #calculate center
         box_location = mathutils.Vector(((Min_X + Max_X) / 2, (Min_Y + Max_Y) / 2, (Min_Z + Max_Z) / 2))
-        bound_box.location = obj.matrix_world @ box_location
+
+        #copy transforms
+        if active_space.type == 'LOCAL':
+            print("DEBUG: local")
+            bound_box.location = obj.matrix_world @ box_location
+            bound_box.rotation_euler = obj.rotation_euler
+
+        elif active_space.type == 'GLOBAL':
+            print("DEBUG: global")
+            bound_box.location = box_location
+
+        else:
+            print("DEBUG: transform orientation not recognized")
+            print(bpy.context.scene.type)
+
         bound_box.dimensions = Max_X - Min_X, Max_Y - Min_Y, Max_Z - Min_Z
-        bound_box.rotation_euler = obj.rotation_euler
 
         #rename
         bound_box.name = "UBX_" + obj.name + "_.000"
