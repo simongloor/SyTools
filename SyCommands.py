@@ -1010,4 +1010,108 @@ class SY_OT_SyPreviewUV(bpy.types.Operator):
         return {'FINISHED'}
 
 #------------------------------------------------------------------------------------
+
+class SY_OT_EnableMaterialNodes(bpy.types.Operator):
+    bl_idname = "object.sy_enable_material_nodes"
+    bl_label = "Enable Material Nodes (Sy)"
+    bl_description = "Makes all materials of the selected objects use nodes."
+
+    def execute(self, context):
+        #Iterate over material slots of objects
+        selected = bpy.context.selected_objects
+        for obj in selected:
+
+            for mat_slot in obj.material_slots:
+                mat_slot.material.use_nodes = True
+
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+
+class SY_OT_FixZeroAlphas(bpy.types.Operator):
+    bl_idname = "object.sy_fix_zero_alphas"
+    bl_label = "Fix Zero Alphas (Sy)"
+    bl_description = "Sets alphas that are 0 to 1 on all materials of the selected objects."
+
+    def execute(self, context):
+        #Iterate over material slots of objects
+        selected = bpy.context.selected_objects
+        for obj in selected:
+
+            for mat_slot in obj.material_slots:
+                bsdf = mat_slot.material.node_tree.nodes["Principled BSDF"]
+                if bsdf is None:
+                    continue
+                if bsdf.inputs['Alpha'].default_value == 0.0:
+                    bsdf.inputs['Alpha'].default_value = 1.0
+
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+
+class SY_OT_ReduceMaterials(bpy.types.Operator):
+    bl_idname = "object.sy_reduce_materials"
+    bl_label = "Reduce Materials (Sy)"
+
+    def execute(self, context):
+
+        ModeAtStart = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='OBJECT')
+        SelectedAtStart = bpy.context.view_layer.objects.active
+
+        #Iterate through Objects
+        ObjectsToSetUp = bpy.context.selected_objects
+        if len(ObjectsToSetUp) > 0:
+            for iObject in ObjectsToSetUp:
+                if iObject.type == 'MESH':
+
+                    #Set Object Active
+                    bpy.context.view_layer.objects.active = iObject
+
+                    #Go through Materials
+                    IsDone = False;
+                    CurrentMaterialID = 0
+                    while not IsDone:
+                        #Mode
+                        bpy.ops.object.mode_set(mode='EDIT')
+                        bpy.ops.mesh.select_mode(type="FACE")
+
+                        #Deselect Mesh
+                        bpy.ops.mesh.select_all(action='DESELECT')
+
+                        #Select Current Material
+                        bpy.context.object.active_material_index = CurrentMaterialID
+
+                        #Select Assigned
+                        bpy.ops.object.material_slot_select()
+
+                        #Mode
+                        bpy.ops.object.mode_set(mode='OBJECT')
+
+                        #Get selected
+                        FoundSelectedMesh = False
+                        for p in iObject.data.polygons:
+                            if p.select == True:
+                                FoundSelectedMesh = True
+                                break
+
+                        #Found?
+                        if FoundSelectedMesh == True:
+                            #Iterate
+                            CurrentMaterialID += 1
+                        else:
+                            bpy.ops.object.material_slot_remove()
+
+                        #Next Slot exists?
+                        if CurrentMaterialID >= len(iObject.data.materials):
+                            IsDone = True
+
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.context.view_layer.objects.active = SelectedAtStart
+        bpy.ops.object.mode_set(mode = ModeAtStart)
+
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------

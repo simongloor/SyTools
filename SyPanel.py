@@ -65,9 +65,7 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row.operator('object.sy_split_bounds', text = 'Split Bounds')
 
         #UV
-        uvbox = self.layout.box()
-        uvbox.label(text='UV')
-        box = uvbox.box()
+        box = self.layout.box()
         box.label(text='UV from Origin')
 
         col = box.column(align=True)
@@ -76,10 +74,20 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row = col.row(align=True)
         row.operator('object.sy_apply_uv_origin', text = 'Apply')
 
-        box = uvbox
+        #Materials
+        box = self.layout.box()
+        box.label(text='Material')
+
         col = box.column(align=True)
         row = col.row(align=True)
-        row.operator('object.sy_preview_uv', text = 'Toggle Preview')
+        row.operator('object.sy_preview_uv', text = 'Toggle UV Preview')
+        row = col.row(align=True)
+        row.operator('object.sy_reduce_materials', text = 'Reduce Materials')
+        row = col.row(align=True)
+        row.operator('object.sy_fix_zero_alphas', text = 'Fix 0 Alphas')
+        row = col.row(align=True)
+        row.operator('object.sy_enable_material_nodes', text = 'Enable Nodes')
+
 
 
 #************************************************************************************
