@@ -46,6 +46,7 @@ classes = (
     SyCommands.SY_OT_Weight2VertexCol,
     SyCommands.SY_OT_SySeamBorder,
     SyCommands.SY_OT_FindNgons,
+    # SyCommands.SY_OT_TransformFromSelection,
     SyCommands.SY_OT_SyCreateBounds_FromObjects,
     SyCommands.SY_OT_SyCreateBounds_FromVertices,
     SyCommands.SY_OT_SySplitBounds,

@@ -44,6 +44,14 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row.operator('mesh.normals_make_consistent', text = 'Recalculate')
         row.operator('mesh.flip_normals', text = 'Flip Direction')
 
+        # #Model
+        # box = self.layout.box()
+        # box.label(text='Model')
+        #
+        # col = box.column(align=True)
+        # row = col.row(align=True)
+        # row.operator('mesh.sy_transform_from_selection', text = 'Transform from Selection')
+
         #Collision
         box = self.layout.box()
         box.label(text='Collision')

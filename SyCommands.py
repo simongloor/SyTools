@@ -611,6 +611,7 @@ def transferWeight2VertexCol(context, method):
 
 #************************************************************************************
 # Add Seams on Border
+
 class SY_OT_SySeamBorder(bpy.types.Operator):
     bl_idname = "mesh.sy_seam_border"
     bl_label = "Seam Border (Sy)"
@@ -631,6 +632,38 @@ class SY_OT_SySeamBorder(bpy.types.Operator):
         bpy.ops.object.vertex_group_remove()
 
         return {'FINISHED'}
+
+
+#************************************************************************************
+# Add Seams on Border
+
+# class SY_OT_TransformFromSelection(bpy.types.Operator):
+#     bl_idname = "mesh.sy_transform_from_selection"
+#     bl_label = "Transform from Selection (Sy)"
+#     bl_description = "Create and set a Transform Orientation based on the current selection."
+#
+#     def execute(self, context):
+#
+#         #Delete existing
+#         # for slot in bpy.context.scene.transform_orientation_slots:
+#         #     print(slot.type)
+#         #     if slot.type != 'DEFAULT':
+#         #     #if slot.custom_orientation is None:
+#         #         print("Not a custom slot")
+#         #         continue
+#         #     if slot.custom_orientation.name == "SY":
+#         #         print("Found SY")
+#         #         bpy.ops.transform.select_orientation(orientation='SY')
+#         #         bpy.ops.transform.delete_orientation()
+#         #         break
+#         # bpy.ops.transform.select_orientation(orientation='SY')
+#         # bpy.ops.transform.delete_orientation()
+#
+#         #Create new
+#         bpy.ops.transform.create_orientation(use=True)
+#         bpy.context.scene.transform_orientation_slots[0].custom_orientation.name = "SY"
+#
+#         return {'FINISHED'}
 
 
 #************************************************************************************
@@ -701,8 +734,11 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
             #Get coordinate
             if active_space.type == 'GLOBAL':
                 co_final = obj.matrix_world @ vert.co
-            if active_space.type == 'LOCAL':
+            elif active_space.type == 'LOCAL':
                 co_final = vert.co
+            elif active_space.custom_orientation:
+                co_final = obj.matrix_world @ vert.co
+                co_final = active_space.custom_orientation.matrix.inverted() @ co_final
 
             #Get bounding box
             if co_final[0] > Max_X:
@@ -732,16 +768,21 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
 
         #copy transforms
         if active_space.type == 'LOCAL':
-            print("DEBUG: local")
+            #print("DEBUG: local")
             bound_box.location = obj.matrix_world @ box_location
             bound_box.rotation_euler = obj.rotation_euler
 
         elif active_space.type == 'GLOBAL':
-            print("DEBUG: global")
+            #print("DEBUG: global")
             bound_box.location = box_location
 
+        elif active_space.custom_orientation:
+            #print("DEBUG: custom")
+            bound_box.location = active_space.custom_orientation.matrix @ box_location
+            bound_box.rotation_euler = active_space.custom_orientation.matrix.to_euler()
+
         else:
-            print("DEBUG: transform orientation not recognized")
+            #print("DEBUG: transform orientation not recognized")
             print(bpy.context.scene.type)
 
         bound_box.dimensions = Max_X - Min_X, Max_Y - Min_Y, Max_Z - Min_Z
