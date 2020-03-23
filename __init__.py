@@ -50,6 +50,7 @@ classes = (
     SyCommands.SY_OT_SyCreateBounds_FromObjects,
     SyCommands.SY_OT_SyCreateBounds_FromVertices,
     SyCommands.SY_OT_SySplitBounds,
+    SyCommands.SY_OT_SySplitOnSeams, # BROKEN
     SyCommands.SY_OT_SyAddUVOrigin,
     SyCommands.SY_OT_SyApplyUVOrigin,
     SyCommands.SY_OT_SyPreviewUV,

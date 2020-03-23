@@ -1114,4 +1114,63 @@ class SY_OT_ReduceMaterials(bpy.types.Operator):
         return {'FINISHED'}
 
 #------------------------------------------------------------------------------------
+
+class SY_OT_SySplitOnSeams(bpy.types.Operator):
+    bl_idname = "object.sy_clean_all_connections"
+    bl_label = "Cleans all Face Connections (Sy)"
+    bl_description = "Splits all selected objects into already disconnected faces and faces disconnected by seams."
+
+    def execute(self, context):
+
+        ModeAtStart = bpy.context.object.mode
+        bpy.ops.object.mode_set(mode='OBJECT')
+        SelectedAtStart = bpy.context.view_layer.objects.active
+
+        #Iterate through Objects
+        ObjectsToSetUp = bpy.context.selected_objects
+        if len(ObjectsToSetUp) > 0:
+            for iObject in ObjectsToSetUp:
+                if iObject.type == 'MESH':
+
+                    #Set Object Active
+                    bpy.context.view_layer.objects.active = iObject
+
+                    #Mode
+                    bpy.ops.object.mode_set(mode='EDIT')
+
+                    #Clean all
+                    IsDone = False;
+                    while not IsDone:
+                        #Hide selected faces
+                        bpy.ops.mesh.hide(unselected=False)
+
+                        #Still Polys visible?
+                        Mesh = bmesh.from_edit_mesh(iObject.data)
+                        UnhiddenPolys = [f for f in Mesh.faces if f.hide == False]
+                        if len(UnhiddenPolys) == 0:
+                            IsDone = True;
+                        else:
+                            #Select random face
+                            UnhiddenPolys[0].select = True;
+
+                            #Run CleanConnections
+                            bpy.ops.object.sy_clean_connections()
+
+                            #Hide Faces
+                            bpy.ops.mesh.hide(unselected=False)
+
+                    #Unhide all
+                    bpy.ops.mesh.reveal()
+
+
+                    #Mode
+                    bpy.ops.object.mode_set(mode='OBJECT')
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.context.view_layer.objects.active = SelectedAtStart
+        bpy.ops.object.mode_set(mode = ModeAtStart)
+
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------
