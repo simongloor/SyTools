@@ -62,6 +62,10 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
         row = col.row(align=True)
         row.operator('object.sy_create_bounds_from_vertices', text = 'Bounds from Vertices')
         row = col.row(align=True)
+        row.operator('object.sy_create_collision_complex_from_floor', text = 'Complex from Floor')
+        row = col.row(align=True)
+        row.operator('object.sy_create_collision_simple_from_floor', text = 'Simple from Floor')
+        row = col.row(align=True)
         row.operator('object.sy_split_bounds', text = 'Split Bounds')
 
         #UV

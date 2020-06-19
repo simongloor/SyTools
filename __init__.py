@@ -49,6 +49,8 @@ classes = (
     # SyCommands.SY_OT_TransformFromSelection,
     SyCommands.SY_OT_SyCreateBounds_FromObjects,
     SyCommands.SY_OT_SyCreateBounds_FromVertices,
+    SyCommands.SY_OT_SyCreateCollision_Complex_FromFloor,
+    SyCommands.SY_OT_SyCreateCollision_Simple_FromFloor,
     SyCommands.SY_OT_SySplitBounds,
     SyCommands.SY_OT_SySplitOnSeams, # BROKEN
     SyCommands.SY_OT_SyAddUVOrigin,

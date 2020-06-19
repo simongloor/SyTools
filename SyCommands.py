@@ -803,12 +803,33 @@ class SY_OT_SyCreateBounds_FromVertices(bpy.types.Operator):
 
         return {'FINISHED'}
 
+#------------------------------------------------------------------------------------
+
+class SY_OT_SyCreateCollision_Complex_FromFloor(bpy.types.Operator):
+    bl_idname = "object.sy_create_collision_complex_from_floor"
+    bl_label = "Create Complex Collider from Floors (Sy)"
+    bl_description = "Create a complex collider based on the selected floors"
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+#------------------------------------------------------------------------------------
+
+class SY_OT_SyCreateCollision_Simple_FromFloor(bpy.types.Operator):
+    bl_idname = "object.sy_create_collision_simple_from_floor"
+    bl_label = "Create Simple Colliders from Floors (Sy)"
+    bl_description = "Create simple colliders based on the selected floors"
+
+    def execute(self, context):
+        return {'FINISHED'}
+
 #************************************************************************************
 # Split from bound selection
 
 class SY_OT_SySplitBounds(bpy.types.Operator):
     bl_idname = "object.sy_split_bounds"
     bl_label = "Split along Seam (Sy)"
+    bl_description = "Splits a mesh along a seam and closes the holes"
 
     def execute(self, context):
 
