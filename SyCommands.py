@@ -811,6 +811,7 @@ class SY_OT_SyCreateCollision_Complex_FromFloor(bpy.types.Operator):
     bl_description = "Create a complex collider based on the selected floors"
 
     def execute(self, context):
+
         return {'FINISHED'}
 
 #------------------------------------------------------------------------------------
@@ -821,6 +822,118 @@ class SY_OT_SyCreateCollision_Simple_FromFloor(bpy.types.Operator):
     bl_description = "Create simple colliders based on the selected floors"
 
     def execute(self, context):
+
+        # Enable Pivot
+        def get_override(area_type, region_type):
+            for area in bpy.context.screen.areas:
+                if area.type == area_type:
+                    for region in area.regions:
+                        if region.type == region_type:
+                            override = {'area': area, 'region': region}
+                            return override
+                            #error message if the area or region wasn't found
+                            raise RuntimeError("Wasn't able to find", region_type," in area ", area_type, "Make sure it's open while executing script.")
+        bpy.context.scene.tool_settings.transform_pivot_point = 'MEDIAN_POINT'
+        override = get_override( 'VIEW_3D', 'WINDOW' )
+
+        original_floors = bpy.context.selected_objects
+
+        # Create unscaled duplicates
+        bpy.ops.object.duplicate()
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
+        floors_unscaled = bpy.context.selected_objects
+
+        # Create volumes from the floors
+        bpy.ops.object.duplicate()
+        original_floor_volumes = bpy.context.selected_objects
+
+        # Expand
+        for floor in original_floor_volumes:
+            bpy.context.view_layer.objects.active = floor
+            bpy.ops.object.modifier_add(type='SOLIDIFY')
+            bpy.context.object.modifiers["Solidify"].offset = 1
+            bpy.context.object.modifiers["Solidify"].thickness = 2.8
+            bpy.ops.object.modifier_apply(apply_as='DATA', modifier="Solidify")
+
+        # Create a bounding box
+        bpy.ops.object.duplicate()
+        bpy.ops.transform.resize(override, value=(1.2, 1.2, 1), orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(True, True, False), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False)
+        bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
+        bpy.ops.object.join()
+        expanded_floor_volume = bpy.context.active_object
+
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+        bpy.ops.mesh.primitive_cube_add()
+        bound_box = bpy.context.active_object
+        bound_box.dimensions = expanded_floor_volume.dimensions
+        bound_box.location = expanded_floor_volume.location
+        bound_box.rotation_euler = expanded_floor_volume.rotation_euler
+        bound_box.name = "FloorCollider.000"
+
+        # Delete expanded floor volume
+        bpy.ops.object.select_all(action='DESELECT')
+        expanded_floor_volume.select_set(state=True)
+        bpy.ops.object.delete(use_global=False, confirm=False)
+
+        # Create a floor collider
+        bpy.ops.object.select_all(action='DESELECT')
+        bound_box.select_set(state=True)
+        bpy.ops.object.duplicate()
+        bpy.ops.transform.translate(override, value=(0, 0, -2.8), orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(False, False, True), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False)
+        floor_collider = bpy.context.active_object
+
+        # Cut out each floor
+        for floor_volume in original_floor_volumes:
+
+            # Scale up pure volume to ensure a clean cut through
+            bpy.ops.object.select_all(action='DESELECT')
+            floor_volume.select_set(state=True)
+            bpy.context.view_layer.objects.active = floor_volume
+            bpy.ops.transform.translate(override, value=(0, 0, -1), orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(False, False, True), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False)
+            bpy.ops.transform.resize(override, value=(1, 1, 2), orient_type='GLOBAL', orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)), orient_matrix_type='GLOBAL', constraint_axis=(False, False, True), mirror=True, use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1, use_proportional_connected=False, use_proportional_projected=False)
+
+            #display as wire
+            bpy.context.object.display_type = 'WIRE'
+            bpy.context.object.show_in_front = True
+
+            # Create bool fix volume
+            bpy.ops.object.duplicate()
+            bpy.ops.object.modifier_add(type='SOLIDIFY')
+            bpy.context.object.modifiers["Solidify"].offset = 0.0
+            floor_volume_bool_fix = bpy.context.active_object
+
+            # Cut out bool fix volume
+            bpy.ops.object.select_all(action='DESELECT')
+            bound_box.select_set(state=True)
+            bpy.context.view_layer.objects.active = bound_box
+            bpy.ops.object.modifier_add(type='BOOLEAN')
+            bpy.context.object.modifiers["Boolean"].object = floor_volume_bool_fix
+            bpy.ops.object.modifier_apply(apply_as='DATA', modifier="Boolean")
+
+            # Cut out pure volume
+            bpy.ops.object.select_all(action='DESELECT')
+            bound_box.select_set(state=True)
+            bpy.context.view_layer.objects.active = bound_box
+            bpy.ops.object.modifier_add(type='BOOLEAN')
+            bpy.context.object.modifiers["Boolean"].object = floor_volume
+            bpy.ops.object.modifier_apply(apply_as='DATA', modifier="Boolean")
+
+            # Clean up
+            bpy.ops.object.select_all(action='DESELECT')
+            floor_volume_bool_fix.select_set(state=True)
+            bpy.context.view_layer.objects.active = floor_volume_bool_fix
+            bpy.ops.object.delete(use_global=False, confirm=False)
+
+        # Clean up
+        bpy.ops.object.select_all(action='DESELECT')
+        for delete_me in original_floor_volumes:
+            delete_me.select_set(state=True)
+        for delete_me in floors_unscaled:
+            delete_me.select_set(state=True)
+        bpy.ops.object.delete(use_global=False, confirm=False)
+
         return {'FINISHED'}
 
 #************************************************************************************
