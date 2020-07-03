@@ -872,6 +872,10 @@ class SY_OT_SyCreateCollision_Simple_FromFloor(bpy.types.Operator):
         bound_box.rotation_euler = expanded_floor_volume.rotation_euler
         bound_box.name = "FloorCollider.000"
 
+        #display as wire
+        bpy.context.object.display_type = 'WIRE'
+        bpy.context.object.show_in_front = True
+
         # Delete expanded floor volume
         bpy.ops.object.select_all(action='DESELECT')
         expanded_floor_volume.select_set(state=True)
