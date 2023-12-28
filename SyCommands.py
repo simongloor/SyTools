@@ -145,7 +145,7 @@ class SY_OT_SyCreateCam(bpy.types.Operator):
 
 #************************************************************************************
 # CreateSculptSphere
-class SY_OT_SyOriginToSelection(bpy.types.Operator):
+class SY_OT_SyCreateSculptsphere(bpy.types.Operator):
     bl_idname = "object.sy_create_sculptsphere"
     bl_label = "Create SculptSphere (Sy)"
 

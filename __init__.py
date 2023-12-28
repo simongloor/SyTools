@@ -15,10 +15,12 @@ if "bpy" in locals():
     # imp.reload(SyNormals)
     print("Reloaded SyTools")
 else:
-    from . import (SyMenu,
-    SyPanel,
-    SyCommands)
+    from . import (
+      SyMenu,
+      SyPanel,
+      SyCommands,
     # , SyNormals
+    )
     print("Imported Sytools")
 
 
@@ -95,6 +97,4 @@ def draw_item(self, context):
     layout = self.layout
     #layout.menu(SyPanel.bl_idname)
     #layout.menu(SyNormals.bl_idname)
-
-# if __name__ == "__main__":
-#     register()
+    

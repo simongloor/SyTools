@@ -23,6 +23,7 @@ class SY_MT_SyMenu(bpy.types.Menu):
         layout.label(text="File")
         layout.separator()
         layout.operator("object.sy_update_links")
+        layout.operator("wm.send2ue")
 
         #ObjectMode
         if bpy.context.mode == 'OBJECT':
