@@ -9,24 +9,21 @@ from sys import float_info as fi
 
 ##########################################################
 # draw UI ButtonS
-class SY_PT_sy_panel_ui(bpy.types.Panel):
-    bl_idname = "SyPanel"
+class SY_PT_sy_panel_ui(Panel):
+    bl_idname = "VIEW3D_PT_sy_panel_ui"
     bl_label = 'SyTools'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SY | flow"
-
-    def __init__(self):
-        pass
 
     @classmethod
     def poll(self, context):
         try:
             ob = context.active_object
             mode = context.mode
-            return 1#(ob.type == 'MESH')
+            return True  # Changed from 1 to True for better Python style
         except AttributeError:
-            return 0
+            return False  # Changed from 0 to False for better Python style
 
     def draw(self, context):
 
@@ -106,8 +103,7 @@ class SY_PT_sy_panel_ui(bpy.types.Panel):
 #     props = ['RunAutoImport', 'RenameFile', 'RunMoveToCenter', 'RunUnparent', 'RunRename', 'RunClean', 'RunModifiers', 'TargetDecimateCount', 'RunRewrapT', 'RunRewrapL', 'RunIslands', 'RunPackT', 'RunPackL', 'PackSize', 'PackRotate', 'OldRewrapT', 'OldRewrapL', 'OldIsland', 'RunExportFBX', 'ExportAnim', 'CurveLength']
 #     for p in props:
 #         if bpy.context.window_manager.get(p) != None:
-#             del bpy.context.window_manager[p]
-#         try:
+#             del bpy.context.window_manager[p]#         try:
 #             x = getattr(bpy.types.WindowManager, p)
 #             del x
 #         except:
