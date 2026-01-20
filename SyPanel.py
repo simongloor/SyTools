@@ -1,9 +1,4 @@
-import bmesh
-import bpy
-import mathutils
-import bgl
 from bpy.types import Panel
-from rna_prop_ui import PropertyPanel
 from sys import float_info as fi
 
 

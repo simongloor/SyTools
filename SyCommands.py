@@ -2,10 +2,8 @@ import sys
 import bpy
 import mathutils
 from mathutils import Vector
-from math import radians
 
 from mathutils import Color
-import random
 from bpy.props import *
 import bmesh
 
