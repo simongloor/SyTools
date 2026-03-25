@@ -36,6 +36,7 @@ classes = (
     SyCommands.SY_OT_SyCreateCamEqui,
     SyCommands.SY_OT_SyCutHole,
     SyCommands.SY_OT_SyCreateCam,
+    SyCommands.SY_OT_SyFaceToPoint,
     SyCommands.SY_OT_SyOriginToSelection,
     SyCommands.SY_OT_SyCreateSkyboxCam,
     SyCommands.SY_OT_SyExtractMasked,

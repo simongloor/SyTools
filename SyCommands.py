@@ -110,7 +110,7 @@ class SY_OT_SyCutHole(bpy.types.Operator):
 
 #************************************************************************************
 # FaceToPoint
-class SY_OT_SyCreateCam(bpy.types.Operator):
+class SY_OT_SyFaceToPoint(bpy.types.Operator):
     bl_idname = "mesh.sy_face_to_point"
     bl_label = "Face to Point (Sy)"
 
